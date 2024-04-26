@@ -47,7 +47,7 @@ class Menu:
         was_cursor_on_text = False
         for i in range(len(self.rects)):
             if self.rects[i].collidepoint(pygame.mouse.get_pos()):
-                self.texts[i] = self.font.render(self.items[i], True, (19,19,19))
+                self.texts[i] = self.font.render(self.items[i], True, "green")
                 if not self.lock :
                  self.hover_sound.play()
                  self.lock = True
