@@ -24,7 +24,7 @@ class Makers:
             screen.fill((19, 19, 19))
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.back_rect.collidepoint(event.pos):
+                    if event.button == 1 and self.back_rect.collidepoint(pygame.mouse.get_pos()):
                         game_makers_screen = False
             screen.blit(self.back_text, self.back_rect)
             self.falling_text(screen)

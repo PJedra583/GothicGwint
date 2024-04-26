@@ -8,7 +8,7 @@ class Menu:
         font_path = os.path.join("data", "fonts", "Gothic_Ingame_Offiziell.ttf")  # Font z gothica
         self.font = pygame.font.Font(font_path, 70)
         self.color = (255, 255, 255)
-        self.items = ["Rozpocznij gre", "Samouczek", "Tworcy gry", "Exit"]
+        self.items = ["Stworz gre","Dolacz do gry", "Samouczek", "Tworcy gry", "Exit"]
         self.background_image = pygame.transform.scale( pygame.image.load("data/Background4.jpg"),
                                                         (screen.get_width(), screen.get_height()) )
         self.background_rect = self.background_image.get_rect()
