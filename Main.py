@@ -13,10 +13,11 @@ class Main:
         screen_info = pygame.display.Info()
         self.SCREEN_WIDTH = screen_info.current_w
         self.SCREEN_HEIGHT = screen_info.current_h
-        self.main_menu = menu.Menu(self.SCREEN_WIDTH,self.SCREEN_HEIGHT)
+        self.window = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+
+        self.main_menu = menu.Menu(self.window)
 
         # Ustawienie rozmiaru okna
-        self.window = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         pygame.display.set_caption("Gothic Gwint")
 
     def run(self):
@@ -26,14 +27,10 @@ class Main:
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:  # LMB
-                        mouse_pos = pygame.mouse.get_pos()
                         if self.main_menu.handle_click() == 3:
                             menu_running = False
             self.main_menu.draw(self.window)
-            cursor = Cursor()
-            cursor.update()
-            cursor.draw(self.window)
-
+            self.main_menu.handle_hover()
             pygame.display.update()
 
         # Zamknięcie Pygame
