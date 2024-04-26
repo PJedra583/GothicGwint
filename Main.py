@@ -9,7 +9,7 @@ class Main:
 
         # Ustawienia menu
         pygame.mouse.set_visible(False)
-        pygame.mixer.music.load("data/music/Gothic 1 Soundtrack  Swamp Camp  Ambient + Music.mp3")
+      #  pygame.mixer.music.load("data/music/Gothic 1 Soundtrack  Swamp Camp  Ambient + Music.mp3")
         screen_info = pygame.display.Info()
         self.SCREEN_WIDTH = screen_info.current_w
         self.SCREEN_HEIGHT = screen_info.current_h
@@ -21,7 +21,7 @@ class Main:
         pygame.display.set_caption("Gothic Gwint")
 
     def run(self):
-        pygame.mixer.music.play()
+      #  pygame.mixer.music.play()
         menu_running = True
         while menu_running:
             for event in pygame.event.get():

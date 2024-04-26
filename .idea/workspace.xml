@@ -4,17 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8957ae46-d718-4aab-845a-00d2a392878f" name="Changes" comment="Initial commit">
-      <change afterPath="$PROJECT_DIR$/data/cursor/test1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cursor.py" beforeDir="false" afterPath="$PROJECT_DIR$/Cursor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/cursor/Cursor.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/cursor/cur_browse.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/cursor/cursor_click.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/cursor/test.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/cursor/test2.png" beforeDir="false" afterPath="$PROJECT_DIR$/data/cursor/test2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/menu.py" afterDir="false" />
+    <list default="true" id="8957ae46-d718-4aab-845a-00d2a392878f" name="Changes" comment="Before bed 2:11">
+      <change afterPath="$PROJECT_DIR$/data/sound/hover.mp3" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -133,7 +124,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1714048089273</updated>
-      <workItem from="1714048105976" duration="27724000" />
+      <workItem from="1714048105976" duration="28002000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -159,7 +150,15 @@
       <option name="project" value="LOCAL" />
       <updated>1714085140168</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Before bed 2:11">
+      <option name="closed" value="true" />
+      <created>1714090302540</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1714090302540</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -168,10 +167,11 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Initial commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Initial commit" />
+    <MESSAGE value="Before bed 2:11" />
+    <option name="LAST_COMMIT_MESSAGE" value="Before bed 2:11" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/GothicGwint$main.coverage" NAME="game Coverage Results" MODIFIED="1714061357907" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GothicGwint$Main.coverage" NAME="Main Coverage Results" MODIFIED="1714090041104" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GothicGwint$Main.coverage" NAME="Main Coverage Results" MODIFIED="1714090184731" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
