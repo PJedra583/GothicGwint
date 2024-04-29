@@ -1,7 +1,7 @@
 import pygame
 import os
 import socket
-from Game2 import game2
+from Game2 import Game2
 from Cursor import Cursor
 from ConnectionManager import ConnectionManager
 from threading import Thread
@@ -50,8 +50,9 @@ class PlayerScreen2:
             pygame.display.update()
 
             if self.connectionManager.turn == 2 :
-
-
+                Game2(self.connectionManager)
+            elif self.connectionManager.turn == 3 :
+                running = False
 
 
     def handle_hover(self):
