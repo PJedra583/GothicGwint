@@ -1,54 +1,42 @@
 import socket
+from threading import Thread
 
 class ConnectionManager:
-    def __init__(self, server, port):
-        self.server = server
+    counter = 0
+    def __init__(self, server_ip, port):
+        self.ip = server_ip
         self.port = port
-        self.socket = None
+        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client_threads = []
+        self.turn = 1
 
-    def create_socket(self):
-        try:
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        except socket.error as msg:
-            print(msg)
+    def start_server(self):
+        self.server_socket.bind((self.ip, self.port))
+        self.server_socket.listen(5)
+        while True:
+            client_socket, client_address = self.server_socket.accept()
+            client_thread = Thread(target=self.handle_client, args=(client_socket, self.counter))
+            client_thread.start()
+            self.client_threads.append(client_thread)
 
-    def prepare_server_and_get_message(self):
+    def handle_client(self, client_socket, counter):
         try:
-            self.create_socket()
-            self.socket.bind((self.server, self.port))
-            self.socket.listen(1)
-            conn, addr = self.socket.accept()
-            from_client = ''
             while True:
-                data = conn.recv(1024)
+                data = client_socket.recv(1024)
                 if not data:
                     break
-                from_client += data.decode('utf-8')
-            conn.close()
-            return from_client
-        except socket.error as msg:
-            print(msg)
-        return None
+                message = data.decode("utf-8")
+                if message == "Hello\n":
+                    self.turn = 2
+        except Exception as e:
+            print(e)
+        finally:
+            client_socket.close()
 
-    def send_message_to_server(self, message):
-        try:
-            self.create_socket()
-            self.socket.connect((self.server, self.port))
-            self.socket.send(f'{message}\n'.encode())
-            self.socket.close()
-        except socket.error as msg:
-            print(msg)
+    def stop_server(self):
+        for thread in self.client_threads:
+            thread.join()
+        self.server_socket.close()
 
-
-
-class Client:
-    def __init__(self, server, port):
-        self.conn_manager = ConnectionManager(server, port)
-
-    def send_message_to_server(self, message):
-        self.conn_manager.send_message_to_server(message)
-
-# Przykładowe użycie
-
-client = Client('127.0.0.1', 8080)
-client.send_message_to_server('Hello World')
+    def get_turn(self):
+        return self.turn

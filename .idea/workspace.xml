@@ -4,21 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8957ae46-d718-4aab-845a-00d2a392878f" name="Changes" comment="--Game makers screen">
-      <change afterPath="$PROJECT_DIR$/Client2.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ConnectionManager.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Main2.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PlayerScreen1.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PlayerScreen2.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Server.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Server2.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/Client.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/Connect.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/table.jpg" afterDir="false" />
+    <list default="true" id="8957ae46-d718-4aab-845a-00d2a392878f" name="Changes" comment="--Experimenting with sockets without thread">
+      <change afterPath="$PROJECT_DIR$/Test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client.py" beforeDir="false" afterPath="$PROJECT_DIR$/Client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client2.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConnectionManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/ConnectionManager.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Makers.py" beforeDir="false" afterPath="$PROJECT_DIR$/Makers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Main2.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PlayerScreen1.py" beforeDir="false" afterPath="$PROJECT_DIR$/PlayerScreen1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PlayerScreen2.py" beforeDir="false" afterPath="$PROJECT_DIR$/PlayerScreen2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server2.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,9 +58,11 @@
     "Python.ConnectionManager.executor": "Run",
     "Python.Main.executor": "Run",
     "Python.Main2.executor": "Run",
+    "Python.PlayerScreen1.executor": "Run",
     "Python.PlayerScreen2.executor": "Run",
     "Python.Server.executor": "Run",
     "Python.Server2.executor": "Run",
+    "Python.Test.executor": "Run",
     "Python.game.executor": "Run",
     "Python.main.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
@@ -76,6 +76,11 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Acer\Desktop\GothicGwint" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="ConnectionManager" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="GothicGwint" />
@@ -216,7 +221,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1714048089273</updated>
-      <workItem from="1714048105976" duration="64370000" />
+      <workItem from="1714048105976" duration="79227000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -274,7 +279,15 @@
       <option name="project" value="LOCAL" />
       <updated>1714141587428</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="--Experimenting with sockets without thread">
+      <option name="closed" value="true" />
+      <created>1714172643428</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1714172643428</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -286,17 +299,20 @@
     <MESSAGE value="Before bed 2:11" />
     <MESSAGE value="--" />
     <MESSAGE value="--Game makers screen" />
-    <option name="LAST_COMMIT_MESSAGE" value="--Game makers screen" />
+    <MESSAGE value="--Experimenting with sockets without thread" />
+    <option name="LAST_COMMIT_MESSAGE" value="--Experimenting with sockets without thread" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/GothicGwint$main.coverage" NAME="game Coverage Results" MODIFIED="1714061357907" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GothicGwint$Main2.coverage" NAME="Main2 Coverage Results" MODIFIED="1714165045716" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GothicGwint$Server.coverage" NAME="Server Coverage Results" MODIFIED="1714167504390" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GothicGwint$Server2.coverage" NAME="Server2 Coverage Results" MODIFIED="1714171976446" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GothicGwint$Main.coverage" NAME="Main Coverage Results" MODIFIED="1714165721732" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GothicGwint$Client2.coverage" NAME="Client2 Coverage Results" MODIFIED="1714171982888" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GothicGwint$Client.coverage" NAME="Client Coverage Results" MODIFIED="1714167507914" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data" />
-    <SUITE FILE_PATH="coverage/GothicGwint$ConnectionManager.coverage" NAME="ConnectionManager Coverage Results" MODIFIED="1714162737352" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GothicGwint$PlayerScreen2.coverage" NAME="PlayerScreen2 Coverage Results" MODIFIED="1714150960482" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GothicGwint$PlayerScreen1.coverage" NAME="PlayerScreen1 Coverage Results" MODIFIED="1714387573228" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GothicGwint$Server.coverage" NAME="Server Coverage Results" MODIFIED="1714378282788" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GothicGwint$Main2.coverage" NAME="Main2 Coverage Results" MODIFIED="1714394426205" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GothicGwint$Server2.coverage" NAME="Server2 Coverage Results" MODIFIED="1714172381523" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GothicGwint$Client2.coverage" NAME="Client2 Coverage Results" MODIFIED="1714172395438" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GothicGwint$Main.coverage" NAME="Main Coverage Results" MODIFIED="1714394411444" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GothicGwint$Client.coverage" NAME="Client Coverage Results" MODIFIED="1714385416405" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GothicGwint$Test.coverage" NAME="Test Coverage Results" MODIFIED="1714390946637" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GothicGwint$ConnectionManager.coverage" NAME="ConnectionManager Coverage Results" MODIFIED="1714172602997" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GothicGwint$PlayerScreen2.coverage" NAME="PlayerScreen2 Coverage Results" MODIFIED="1714394086216" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

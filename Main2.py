@@ -1,10 +1,10 @@
 import pygame
 import menu
 
-import ConnectionManager
 from Makers import Makers
 from PlayerScreen1 import PlayerScreen
 from PlayerScreen2 import PlayerScreen2
+
 class Main:
 
     def __init__(self):
@@ -24,7 +24,7 @@ class Main:
         pygame.display.set_caption("Gothic Gwint")
 
     def run(self):
-      #  pygame.mixer.music.play()
+     #   pygame.mixer.music.play()
         menu_running = True
         while menu_running:
             for event in pygame.event.get():
@@ -33,9 +33,9 @@ class Main:
                         button_number = self.main_menu.handle_click()
                         #Stworz,Dolacz,Samouczek,tworcy,exit
                         if button_number == 0:
-                            PlayerScreen(self.window)
-                        elif button_number == 1:
                             PlayerScreen2(self.window)
+                        elif button_number == 1:
+                            PlayerScreen(self.window)
                         elif button_number == 2:
                             print()
                         elif button_number == 3:
@@ -46,7 +46,6 @@ class Main:
             self.main_menu.handle_hover()
             pygame.display.update()
 
-        # Zamknięcie Pygame
         pygame.quit()
 
 if __name__ == "__main__":
