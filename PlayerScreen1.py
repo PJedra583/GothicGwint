@@ -9,6 +9,8 @@ class PlayerScreen:
                                                        (screen.get_width(), screen.get_height()))
         self.background_rect = self.background_image.get_rect()
         self.font_gothic = pygame.font.Font(os.path.join("data", "fonts", "Gothic_Ingame_Offiziell.ttf"), 36)
+        font_path = os.path.join("data", "fonts", "comic.ttf")  # Font z gothica
+        self.font = pygame.font.Font(font_path, 20)
         self.cursor = Cursor()
         self.cursor.changeType(2)
         self.display_text = "Podaj adres IP"
@@ -22,7 +24,7 @@ class PlayerScreen:
             topleft=(screen.get_width() // 2.5 + 200, screen.get_height() // 4 + 350))
 
         running = True
-        input_text = ""
+        input_text = "127.0.0.1"
         while running:
             screen.fill((255,255,255))
             screen.blit(self.background_image,self.background_rect)
@@ -32,7 +34,7 @@ class PlayerScreen:
                         input_text = ""
                         if(self.test_connection(input_text)):
                             print("True")
-                            game.Game()
+                            game.Game(screen)
                         else:
                             self.display_text = "Bledny adres IP"
                     elif event.key == pygame.K_BACKSPACE:
@@ -44,7 +46,7 @@ class PlayerScreen:
                         running = False
                     elif event.button == 1 and self.connect_text_rect.collidepoint(pygame.mouse.get_pos()):
                         if (self.test_connection(input_text)):
-                            game.Game()
+                            game.Game(screen)
                             print("True")
                         else:
                             self.display_text = "Bledny adres IP"

@@ -18,7 +18,7 @@ class Makers:
         self.makers_items = \
             ["Oprogramowanie: Piotr Jędra","Udźwiękowienie: Franciszek Kalinowski","Karty do gry: Bractwo Sposzczenia"]
         self.makers_names = pygame.font.Font(font_path_comic, 40)
-        self.makers_y = -300
+        self.makers_y = -300 # Początkowa pozycja dla pierwszego tekstu
         game_makers_screen = True
         while game_makers_screen:
             screen.fill((19, 19, 19))
@@ -51,8 +51,8 @@ class Makers:
             self.cursor.changeType(2)
 
     def falling_text(self, screen):
-        text_gap = 100  # Odstęp pomiędzy kolejnymi tekstami
-        y_offset = self.makers_y  # Początkowa pozycja pionowa dla pierwszego tekstu
+        text_gap = 100
+        y_offset = self.makers_y
 
         for name in self.makers_items:
             text_surface = self.makers_names.render(name, True, (255, 255, 255))

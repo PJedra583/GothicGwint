@@ -50,7 +50,7 @@ class PlayerScreen2:
             pygame.display.update()
 
             if self.connectionManager.turn == 2 :
-                Game2(self.connectionManager)
+                Game2(screen,self.connectionManager)
             elif self.connectionManager.turn == 3 :
                 running = False
 
