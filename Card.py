@@ -4,16 +4,18 @@ import random
 class Card:
     cards = []
     heroses = []
-
+    id_counter = 0
     def __init__(self,name,power,type,effects) :
         if name!=None:
          self.image = pygame.image.load("data/textures/"+name+".jpg")
          self.name = name
-         self.effects = []
+         self.effects = effects
          for effect in effects :
              self.effects.append(effect)
-         self.type = []
-         self.power = []
+         self.type = type
+         self.power = power
+         self.id = self.id_counter
+         self.id_counter += 1
 
 
     def load_cards(self):
@@ -102,6 +104,9 @@ class Card:
     def getHeroCard(self):
         c = self.heroses.pop(0)
         return c
+
+    def getDeck(self):
+        return self.cards
 
 
 

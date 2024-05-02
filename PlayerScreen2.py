@@ -1,7 +1,7 @@
 import pygame
 import os
 import socket
-from Game2 import Game2
+import game
 from Cursor import Cursor
 from ConnectionManager import ConnectionManager
 from threading import Thread
@@ -47,12 +47,16 @@ class PlayerScreen2:
 
             self.handle_hover()
 
-            pygame.display.update()
 
-            if self.connectionManager.turn == 2 :
-                Game2(screen,self.connectionManager)
-            elif self.connectionManager.turn == 3 :
+            if (self.connectionManager.turn == 2):
+                print("i was here")
+                ip = self.getLocalIP()
+                g = game.Game(screen, ip, 2)
+                g.run()
+            elif self.connectionManager.turn == 3:
                 running = False
+
+            pygame.display.update()
 
 
     def handle_hover(self):
@@ -74,7 +78,6 @@ class PlayerScreen2:
                 sock.connect(("8.8.8.8", 80))
                 local_ip = sock.getsockname()[0]
                 sock.close()
-                print(type(local_ip))
                 return local_ip
             except Exception as e:
                 print(e)

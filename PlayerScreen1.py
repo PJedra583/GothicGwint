@@ -31,10 +31,9 @@ class PlayerScreen:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        input_text = ""
                         if(self.test_connection(input_text)):
-                            print("True")
-                            game.Game(screen)
+                            g = game.Game(screen, input_text, 1)
+                            g.run()
                         else:
                             self.display_text = "Bledny adres IP"
                     elif event.key == pygame.K_BACKSPACE:
@@ -46,8 +45,8 @@ class PlayerScreen:
                         running = False
                     elif event.button == 1 and self.connect_text_rect.collidepoint(pygame.mouse.get_pos()):
                         if (self.test_connection(input_text)):
-                            game.Game(screen)
-                            print("True")
+                            g = game.Game(screen,input_text,1)
+                            g.run()
                         else:
                             self.display_text = "Bledny adres IP"
                         input_text = ""
