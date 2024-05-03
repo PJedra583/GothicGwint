@@ -48,11 +48,11 @@ class PlayerScreen2:
             self.handle_hover()
 
 
-            if (self.connectionManager.turn == 2):
+            if (self.connectionManager.start == 2):
                 ip = self.getLocalIP()
                 g = game.Game(screen, ip, 2)
                 g.run()
-            elif self.connectionManager.turn == 3:
+            elif self.connectionManager.start == 3:
                 running = False
 
             pygame.display.update()

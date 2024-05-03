@@ -14,7 +14,6 @@ class Game:
 
     def __init__(self,screen,server_ip,player):
 
-
         self.server_ip = server_ip
         self.screen = screen
         self.player = player
@@ -33,7 +32,7 @@ class Game:
         self.my_cards = []
         self.opponent_cards_len = 0
         self.my_score = 0
-        self.opponent_score = 0
+        self.opp_score = 0
         self.cursor = Cursor()
         self.heroCard = None
         self.opp_heroCard = None
@@ -41,11 +40,27 @@ class Game:
         self.opp_hp = 2
         self.falling_text_x = 0
         self.turn_notif = True
-        self.turn = False
+        self.turn = None
+        self.choosing = False
         self.clock = pygame.time.Clock()
         self.timer = 0
         self.cardReverse = pygame.transform.scale(pygame.image.load("data/textures/rewers.jpg"),(CARD_SIZE_X,CARD_SIZE_Y))
         self.player_num = player
+        self.stopHover = False
+        self.rects_to_display = []
+        self.card_to_display = None
+        self.hero_card_to_display = None
+        self.moved = False
+
+        #Pole bitwy
+        self.MyFrontRow = []
+        self.MyMiddleRow = []
+        self.MyBackRow = []
+
+        self.OppFrontRow = []
+        self.OppMiddleRow = []
+        self.OppBackRow = []
+
 
         #polaczenie z serwerem
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -54,26 +69,27 @@ class Game:
 
     def run(self):
 
-       print(len(self.all_Cards))
-
-       self.opponent_cards_len = int(send_mess(self,"GetOppCardsLength\n"))
-       my_cards_as_string = send_mess(self,"GetMyCards\n")
-       self.opp_heroCard = self.allHeroes[int(send_mess(self,"GetOppHeroCard\n"))]
-       self.heroCard = self.allHeroes[int(send_mess(self,"GetMyHeroCard\n"))]
-       self.hp = int(send_mess(self,"GetMyHP\n"))
-       self.opp_hp = int(send_mess(self,"GetOppHP\n"))
-       for i in my_cards_as_string.split(";"):
-           if i.strip() != "":
-            index = int(i)
-            self.my_cards.append(self.all_Cards[index])
-
+       prepare_battlefield(self)
        running = True
        screen_width = self.screen.get_width()
        screen_height = self.screen.get_height()
 
        while running:
+            if self.moved:
+                prepare_battlefield(self)
             for event in pygame.event.get():
-                x = 5
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:  # LMB
+                        if self.turn :
+                         checkIfMove(self,self.screen)
+                        if self.turn :
+                         self.rects_to_display = []
+                         self.card_to_display = None
+                         handle_click(self,self.screen)
+                    else:
+                        self.rects_to_display = []
+                        self.card_to_display = None
+                        self.stopHover = False
             self.screen.blit(self.background_image, self.background_image.get_rect())
 
             #Linia statystyk, karta bohatera gora,pasek wyniku przeciwnik, pasek wyniku gracz
@@ -104,25 +120,41 @@ class Game:
             pygame.draw.rect(self.screen, "black", (0, screen_height - (screen_height // 4) - screen_height * 0.2,
                                         screen_width * 0.2, screen_height * 0.2)) #bo rect.height = screen.height * 0.2
 
-            text_surface = self.font.render("Ty",True,"white")
+            text_surface = self.font.render("Przeciwnik",True,"white")
             text_rect = text_surface.get_rect(center=(screen_width*0.1,(screen_height//4)+(screen_height*0.1)))
             self.screen.blit(text_surface,text_rect)
 
-            text_surface = self.font.render("Przeciwnik", True, "white")
+            text_surface = self.font.render("Ty", True, "white")
             text_rect = text_surface.get_rect(center=(screen_width * 0.1,
                                                       screen_height - (screen_height // 4) - (screen_height * 0.1)))
             self.screen.blit(text_surface, text_rect)
 
             #Zycia
             image = pygame.image.load("data/HP.jpg")
+            image2 = pygame.image.load("data/EmptyHP.png")
+
             image = pygame.transform.scale(image, (50, 50))
+            image2 = pygame.transform.scale(image2, (50, 50))
 
-            self.screen.blit(image, (0+screen_width*0.08, screen_height - (screen_height // 4)-(screen_height * 0.075) ))
-            self.screen.blit(image, (0+screen_width*0.12, screen_height - (screen_height // 4)-(screen_height * 0.075) ))
+            if self.hp > 1 :
+             self.screen.blit(image, (0+screen_width*0.08, screen_height - (screen_height // 4)-(screen_height * 0.075) ))
+             self.screen.blit(image, (0+screen_width*0.12, screen_height - (screen_height // 4)-(screen_height * 0.075) ))
+            elif self.hp > 0 :
+             self.screen.blit(image, (0 + screen_width * 0.08, screen_height - (screen_height // 4) - (screen_height * 0.075)))
+             self.screen.blit(image2, (0 + screen_width * 0.12, screen_height - (screen_height // 4) - (screen_height * 0.075)))
+            else:
+             self.screen.blit(image2, (0 + screen_width * 0.08, screen_height - (screen_height // 4) - (screen_height * 0.075)))
+             self.screen.blit(image2, (0 + screen_width * 0.12, screen_height - (screen_height // 4) - (screen_height * 0.075)))
 
-            self.screen.blit(image,(0+screen_width*0.08, screen_height // 4+(screen_height * 0.125) ))
-            self.screen.blit(image,(0+screen_width*0.12, screen_height // 4+(screen_height * 0.125) ))
-
+            if self.opp_hp > 1:
+                 self.screen.blit(image, (0 + screen_width * 0.08, screen_height // 4 + (screen_height * 0.125)))
+                 self.screen.blit(image, (0 + screen_width * 0.12, screen_height // 4 + (screen_height * 0.125)))
+            elif self.opp_hp > 0:
+                 self.screen.blit(image, (0 + screen_width * 0.08, screen_height // 4 + (screen_height * 0.125)))
+                 self.screen.blit(image2, (0 + screen_width * 0.12, screen_height // 4 + (screen_height * 0.125)))
+            else:
+                 self.screen.blit(image2, (0 + screen_width * 0.08, screen_height // 4 + (screen_height * 0.125)))
+                 self.screen.blit(image2, (0 + screen_width * 0.12, screen_height // 4 + (screen_height * 0.125)))
 
             #linie
             space_for_line = self.screen.get_height()//8
@@ -142,7 +174,7 @@ class Game:
             pygame.draw.circle(self.screen, "white", (screen_width * 0.2, screen_height - (screen_height // 4) -
                                                       (screen_height * 0.1)), 30)
 
-            text_surface = self.font.render(str(self.opponent_score), True, "Black")
+            text_surface = self.font.render(str(self.opp_score), True, "Black")
             text_rect = text_surface.get_rect(center=(screen_width * 0.2, screen_height // 4 + (screen_height * 0.1)))
             self.screen.blit(text_surface, text_rect)
 
@@ -159,12 +191,59 @@ class Game:
             for i in range(self.opponent_cards_len) :
                 self.screen.blit(self.cardReverse, (screen_width * 0.26+(i*CARD_SIZE_X*0.9), 0))
 
-            handle_hover(self, self.screen)
+            #pole bitwy
+            for i in range(len(self.MyFrontRow)) :
+                image = self.MyFrontRow[i].image
+                image = pygame.transform.scale(image,(CARD_SIZE_X,CARD_SIZE_Y))
+                self.screen.blit(image, (screen_width * 0.36+(i*CARD_SIZE_X*0.9),
+                                                    (space_for_line*4) + (space_for_line-CARD_SIZE_Y)))
+            for i in range(len(self.MyMiddleRow)) :
+                image = self.MyMiddleRow[i].image
+                image = pygame.transform.scale(image,(CARD_SIZE_X,CARD_SIZE_Y))
+                self.screen.blit(image, (screen_width * 0.36+(i*CARD_SIZE_X*0.9),
+                                                    (space_for_line*5) + (space_for_line-CARD_SIZE_Y)))
+            for i in range(len(self.MyBackRow)) :
+                image = self.MyBackRow[i].image
+                image = pygame.transform.scale(image,(CARD_SIZE_X,CARD_SIZE_Y))
+                self.screen.blit(image, (screen_width * 0.36+(i*CARD_SIZE_X*0.9),
+                                                    (space_for_line*6) + (space_for_line-CARD_SIZE_Y)))
+            #================
+            for i in range(len(self.OppFrontRow)) :
+                image = self.OppFrontRow[i].image
+                image = pygame.transform.scale(image,(CARD_SIZE_X,CARD_SIZE_Y))
+                self.screen.blit(image, (screen_width * 0.36+(i*CARD_SIZE_X*0.9),
+                                                    (space_for_line*3) + (space_for_line-CARD_SIZE_Y)))
+            for i in range(len(self.OppMiddleRow)) :
+                image = self.OppMiddleRow[i].image
+                image = pygame.transform.scale(image,(CARD_SIZE_X,CARD_SIZE_Y))
+                self.screen.blit(image, (screen_width * 0.36+(i*CARD_SIZE_X*0.9),
+                                                    (space_for_line*2) + (space_for_line-CARD_SIZE_Y)))
+            for i in range(len(self.OppBackRow)) :
+                image = self.OppBackRow[i].image
+                image = pygame.transform.scale(image,(CARD_SIZE_X,CARD_SIZE_Y))
+                self.screen.blit(image, (screen_width * 0.36+(i*CARD_SIZE_X*0.9),
+                                                    (space_for_line*1) + (space_for_line-CARD_SIZE_Y)))
+
+            #wybor pola
+            if not self.stopHover :
+                handle_hover(self, self.screen)
+            else:
+                card_display_place = (self.screen.get_width() - 220, self.screen.get_height() // 2)
+                if self.card_to_display is not None:
+                    for rect in self.rects_to_display:
+                        pygame.draw.rect(self.screen,(255, 255, 0, 255),rect)
+                    self.screen.blit(self.all_Cards[self.card_to_display].image, card_display_place)
+                elif self.hero_card_to_display is not None:
+                    self.screen.blit(self.allHeroes[self.card_to_display].image, card_display_place)
 
             falling_text(self, self.screen)
-
             self.cursor.update()
             self.cursor.draw(self.screen)
+
+            if not self.turn:
+                s = send_mess(self,"GetMyTurn\n")
+                if int(s) == 1:
+                    self.turn = True
             pygame.display.update()
 
        self.client.close()
@@ -189,9 +268,47 @@ def handle_hover(self, screen):
     if hero_rect.collidepoint(mouse_pos) :
         screen.blit(self.opp_heroCard.image, card_display_place)
 
+def handle_click(self,screen):
+    mouse_pos = pygame.mouse.get_pos()
+    screen_width = screen.get_width()
+    screen_height = screen.get_height()
+    i = 0;
+    for card in self.my_cards:
+        card_rect = (pygame.Rect((screen.get_width() * 0.26+(i*CARD_SIZE_X*0.9), screen.get_height() - CARD_SIZE_Y),
+                                 (CARD_SIZE_X, CARD_SIZE_Y)))
+        if card_rect.collidepoint(mouse_pos):
+            if len(self.rects_to_display) > 0:
+                self.rects_to_display = []
+            space_for_line = self.screen.get_height() // 8
+            if card.type == "front":
+                self.rects_to_display.append((screen_width * 0.25,space_for_line * 4,
+                                                 screen_width*0.75,space_for_line))
+            elif card.type == "middle":
+                self.rects_to_display.append((screen_width * 0.25, space_for_line * 5,
+                                              screen_width * 0.75, space_for_line))
+            elif card.type == "back":
+                self.rects_to_display.append((screen_width * 0.25, space_for_line * 6,
+                                              screen_width * 0.75, space_for_line))
+            elif card.type == "mixed":
+                self.rects_to_display.append((screen_width * 0.25, space_for_line * 4,
+                                              screen_width * 0.75, space_for_line))
+                self.rects_to_display.append((screen_width * 0.25, space_for_line * 5,
+                                              screen_width * 0.75, space_for_line))
+            self.card_to_display = card.id
+        i+=1
+    hero_rect = pygame.Rect(screen.get_width() * 0.025, screen.get_height() * 0.80,
+                                                    CARD_SIZE_X, CARD_SIZE_Y)
+    if hero_rect.collidepoint(mouse_pos):
+        self.hero_card_to_display = self.heroCard
+        self.card_to_display = None
+    self.stopHover = True
 
 def falling_text(self,screen):
-    text_surface = self.font_comic.render("Twoj Ruch", True, "black")
+    if self.turn == True:
+        text = "Twoj Ruch"
+    else:
+        text = "Ruch przeciwnika"
+    text_surface = self.font_comic.render(text, True, "black")
     text_rect = text_surface.get_rect(center=(self.falling_text_x, screen.get_height()//2))
     if self.falling_text_x >= screen.get_width()//2 and (0 <= self.timer <= 2):
         self.timer += self.clock.tick(60) / 1000
@@ -199,9 +316,82 @@ def falling_text(self,screen):
         self.falling_text_x += 50
     self.screen.blit(text_surface, text_rect)
 
+def checkIfMove(self,screen):
+    space_for_line = self.screen.get_height() // 8
+    mouse_pos = pygame.mouse.get_pos()
+    for rect in self.rects_to_display:
+        rect_obj = pygame.Rect(rect)
+        if rect_obj.collidepoint(mouse_pos):
+            if rect[1] == (space_for_line * 4):
+                send_mess(self, "M;" + str(self.card_to_display) + ";" + "f" + ";\n")
+            elif rect[1] == (space_for_line*5):
+                send_mess(self, "M;" + str(self.card_to_display) + ";" + "m" + ";\n")
+            elif rect[1] == (space_for_line*6):
+                send_mess(self, "M;" + str(self.card_to_display) + ";" + "b" + ";\n")
+            self.moved = True
+def prepare_battlefield(self):
+    self.my_cards = []
+    s = send_mess(self,"GetMyCards\n")
+    add_cards_to_List(self,s,self.my_cards)
+
+    s = send_mess(self, "GetOppCardsLength\n")
+    self.opponent_cards_len = int(s)
+
+    self.MyFrontRow = []
+    s = send_mess(self,"GetMyFrontRow\n")
+    add_cards_to_List(self, s, self.MyFrontRow)
+
+    self.MyMiddleRow = []
+    s = send_mess(self,"GetMyMiddleRow\n")
+    add_cards_to_List(self, s, self.MyMiddleRow)
+
+    self.MyBackRow = []
+    s = send_mess(self,"GetMyBackRow\n")
+    add_cards_to_List(self, s, self.MyBackRow)
+
+    self.OppFrontRow = []
+    s = send_mess(self,"GetOppFrontRow\n")
+    add_cards_to_List(self, s, self.OppFrontRow)
+
+    self.OppMiddleRow = []
+    s = send_mess(self,"GetOppMiddleRow\n")
+    add_cards_to_List(self, s, self.OppMiddleRow)
+
+    self.OppBackRow = []
+    s = send_mess(self,"GetOppBackRow\n")
+    add_cards_to_List(self, s, self.OppBackRow)
+
+    self.opp_heroCard = self.allHeroes[int(send_mess(self, "GetOppHeroCard\n"))]
+    self.heroCard = self.allHeroes[int(send_mess(self, "GetMyHeroCard\n"))]
+
+    self.hp = int(send_mess(self, "GetMyHP\n"))
+    self.opp_hp = int(send_mess(self, "GetOppHP\n"))
+
+    self.my_score = int(send_mess(self, "GetMyScore\n"))
+    self.opp_score = int(send_mess(self, "GetOppScore\n"))
+
+    turn = send_mess(self, "GetMyTurn\n")
+    if int(turn.strip()) == 0:
+        self.turn = False
+    else:
+        self.turn = True
+
+    self.moved = False
+    self.stopHover = False
+    self.falling_text_x = 0
+
+
+def add_cards_to_List(self,mess,card_list):
+
+  #  if ";" in mess:
+     for i in mess.split(";"):
+        if i.strip() != "":
+            index = int(i)
+            card_list.append(self.all_Cards[index])
 def send_mess(self,mess):
     try:
-
+        print("==================================")
+        print("Send mess: " + mess)
         self.client.send(mess.encode("utf-8"))
 
         response = self.client.recv(1024)
@@ -210,7 +400,7 @@ def send_mess(self,mess):
         return received_message
 
     except Exception as e:
-        return e
+        return ""
 
 
 
