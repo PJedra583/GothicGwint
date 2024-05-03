@@ -21,7 +21,7 @@ class PlayerScreen2:
             topleft=(20, 20))
 
         try:
-            self.connectionManager = ConnectionManager(self.getLocalIP(), 8090)
+            self.connectionManager = ConnectionManager(self.getLocalIP(), 8091)
             self.server_thread = Thread(target=self.connectionManager.start_server)
             self.server_thread.start()
         except Exception as e:
@@ -49,7 +49,6 @@ class PlayerScreen2:
 
 
             if (self.connectionManager.turn == 2):
-                print("i was here")
                 ip = self.getLocalIP()
                 g = game.Game(screen, ip, 2)
                 g.run()

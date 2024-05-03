@@ -24,7 +24,7 @@ class PlayerScreen:
             topleft=(screen.get_width() // 2.5 + 200, screen.get_height() // 4 + 350))
 
         running = True
-        input_text = "127.0.0.1"
+        input_text = "192.168.1.26"
         while running:
             screen.fill((255,255,255))
             screen.blit(self.background_image,self.background_rect)
@@ -100,7 +100,7 @@ class PlayerScreen:
     def test_connection(self,ip_adrr):
         try:
             client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            client.connect((ip_adrr, 8090))
+            client.connect((ip_adrr, 8091))
             client.send("Hello\n".encode())
             client.close()
             return True

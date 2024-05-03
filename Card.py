@@ -4,21 +4,29 @@ import random
 class Card:
     cards = []
     heroses = []
-    id_counter = 0
+    count_id = 0
+    hero_count_id = 0;
+    instance = None
     def __init__(self,name,power,type,effects) :
         if name!=None:
          self.image = pygame.image.load("data/textures/"+name+".jpg")
          self.name = name
-         self.effects = effects
+         self.effects = []
          for effect in effects :
              self.effects.append(effect)
          self.type = type
          self.power = power
-         self.id = self.id_counter
-         self.id_counter += 1
+         self.id = 0
 
+    @classmethod
+    def getInstance(cls):
+        if not cls.instance:
+            cls.instance = cls(None, None, None, None)
+        return cls.instance
 
     def load_cards(self):
+        #tylko jedna instancja cards i heroes
+     if len(self.cards) == 0 == len(self.heroses):
         f = "front"
         mid = "middle"
         b = "back"
@@ -95,18 +103,35 @@ class Card:
         self.cards.append(Card("Wrzód2", 8, f, ()))
         self.cards.append(Card("Xardas", 15, f, (h,)))
         self.cards.append(Card("Y'Berion", 5, b, (u,)))
+
+        counter = 0
+        for card in self.cards:
+            card.id += counter
+            counter += 1
+        counter = 0
+        for card in self.heroses:
+            card.id += counter
+            counter += 1
         random.shuffle(self.cards)
+        random.shuffle(self.heroses)
 
 
     def getCard(self):
         c = self.cards.pop(0)
         return c
-    def getHeroCard(self):
-        c = self.heroses.pop(0)
-        return c
+
+
 
     def getDeck(self):
         return self.cards
+
+    @staticmethod
+    def getSortedDeck():
+        return sorted(Card.cards, key=lambda x: x.id)
+
+    @staticmethod
+    def getHeroes():
+        return sorted(Card.heroses, key=lambda x: x.id)
 
 
 

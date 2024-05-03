@@ -1,6 +1,10 @@
 import os
+import threading
+
 import pygame
 import socket
+
+import ConnectionManager
 from Cursor import Cursor
 from Card import Card
 CARD_SIZE_X = 75
@@ -14,9 +18,12 @@ class Game:
         self.server_ip = server_ip
         self.screen = screen
         self.player = player
-        self.c = Card(None,None,None,None)
-        self.allcards = self.c.getDeck
 
+        self.c = Card.getInstance()
+        if player == 1 :
+            self.c.load_cards()
+        self.all_Cards = Card.getSortedDeck()
+        self.allHeroes = Card.getHeroes()
 
         self.background_image = pygame.transform.scale(pygame.image.load("data/Plansza.jpg"),
                                                        (screen.get_width(), screen.get_height()))
@@ -24,13 +31,14 @@ class Game:
         self.font = pygame.font.Font(font_path, 70)
         self.font_comic = pygame.font.Font(os.path.join("data", "fonts", "comic.ttf"), 100)
         self.my_cards = []
-        self.opponent_cards = []
+        self.opponent_cards_len = 0
         self.my_score = 0
         self.opponent_score = 0
         self.cursor = Cursor()
         self.heroCard = None
         self.opp_heroCard = None
         self.hp = 2
+        self.opp_hp = 2
         self.falling_text_x = 0
         self.turn_notif = True
         self.turn = False
@@ -39,18 +47,31 @@ class Game:
         self.cardReverse = pygame.transform.scale(pygame.image.load("data/textures/rewers.jpg"),(CARD_SIZE_X,CARD_SIZE_Y))
         self.player_num = player
 
+        #polaczenie z serwerem
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client.connect((self.server_ip, 8091))
+
 
     def run(self):
 
-        for i in range(10):
-            self.my_cards.append(c.getCard())
-        self.heroCard = c.getHeroCard()
+       print(len(self.all_Cards))
 
-        running = True
-        screen_width = self.screen.get_width()
-        screen_height = self.screen.get_height()
+       self.opponent_cards_len = int(send_mess(self,"GetOppCardsLength\n"))
+       my_cards_as_string = send_mess(self,"GetMyCards\n")
+       self.opp_heroCard = self.allHeroes[int(send_mess(self,"GetOppHeroCard\n"))]
+       self.heroCard = self.allHeroes[int(send_mess(self,"GetMyHeroCard\n"))]
+       self.hp = int(send_mess(self,"GetMyHP\n"))
+       self.opp_hp = int(send_mess(self,"GetOppHP\n"))
+       for i in my_cards_as_string.split(";"):
+           if i.strip() != "":
+            index = int(i)
+            self.my_cards.append(self.all_Cards[index])
 
-        while running:
+       running = True
+       screen_width = self.screen.get_width()
+       screen_height = self.screen.get_height()
+
+       while running:
             for event in pygame.event.get():
                 x = 5
             self.screen.blit(self.background_image, self.background_image.get_rect())
@@ -73,15 +94,29 @@ class Game:
             self.screen.blit(hero, (screen_width * 0.025, screen_height * 0.80,
                                     CARD_SIZE_X, CARD_SIZE_Y))
 
+            hero = pygame.transform.scale(self.opp_heroCard.image, (CARD_SIZE_X, CARD_SIZE_Y))
+            self.screen.blit(hero, (screen_width * 0.025, screen_height * 0.025,
+                                    CARD_SIZE_X, CARD_SIZE_Y))
+
             # Prostokat wyników
             pygame.draw.rect(self.screen, "black", (0, screen_height // 4, screen_width * 0.2, screen_height * 0.2))
 
             pygame.draw.rect(self.screen, "black", (0, screen_height - (screen_height // 4) - screen_height * 0.2,
                                         screen_width * 0.2, screen_height * 0.2)) #bo rect.height = screen.height * 0.2
 
+            text_surface = self.font.render("Ty",True,"white")
+            text_rect = text_surface.get_rect(center=(screen_width*0.1,(screen_height//4)+(screen_height*0.1)))
+            self.screen.blit(text_surface,text_rect)
+
+            text_surface = self.font.render("Przeciwnik", True, "white")
+            text_rect = text_surface.get_rect(center=(screen_width * 0.1,
+                                                      screen_height - (screen_height // 4) - (screen_height * 0.1)))
+            self.screen.blit(text_surface, text_rect)
+
             #Zycia
             image = pygame.image.load("data/HP.jpg")
             image = pygame.transform.scale(image, (50, 50))
+
             self.screen.blit(image, (0+screen_width*0.08, screen_height - (screen_height // 4)-(screen_height * 0.075) ))
             self.screen.blit(image, (0+screen_width*0.12, screen_height - (screen_height // 4)-(screen_height * 0.075) ))
 
@@ -121,7 +156,7 @@ class Game:
                 scaled_image = pygame.transform.scale(self.my_cards[i].image, (CARD_SIZE_X, CARD_SIZE_Y))
                 self.screen.blit(scaled_image, (screen_width * 0.26+(i*CARD_SIZE_X*0.9), screen_height-CARD_SIZE_Y))
 
-            for i in range(10) :
+            for i in range(self.opponent_cards_len) :
                 self.screen.blit(self.cardReverse, (screen_width * 0.26+(i*CARD_SIZE_X*0.9), 0))
 
             handle_hover(self, self.screen)
@@ -131,6 +166,8 @@ class Game:
             self.cursor.update()
             self.cursor.draw(self.screen)
             pygame.display.update()
+
+       self.client.close()
 
 
 def handle_hover(self, screen):
@@ -164,28 +201,29 @@ def falling_text(self,screen):
 
 def send_mess(self,mess):
     try:
-        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.connect((self.server_ip, 8090))
-        client.send(mess.encode())
 
-        response = client.recv(1024)
+        self.client.send(mess.encode("utf-8"))
+
+        response = self.client.recv(1024)
         received_message = response.decode("utf-8")
-
-        client.close()
+        print("Received mess: " + received_message)
         return received_message
 
     except Exception as e:
-        return False
+        return e
 
 
 
 if __name__ == "__main__":
+
+    connectionManager = ConnectionManager.ConnectionManager('192.168.1.26',8091)
+    threading.Thread(target=connectionManager.start_server).start()
     pygame.init()
     screen_info = pygame.display.Info()
     SCREEN_WIDTH = screen_info.current_w
     SCREEN_HEIGHT = screen_info.current_h
     window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    main_instance = Game(window)
+    main_instance = Game(window,'192.168.1.26' ,1)
     main_instance.run()
 
 
