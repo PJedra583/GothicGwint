@@ -244,6 +244,7 @@ class Game:
                 s = send_mess(self,"GetMyTurn\n")
                 if int(s) == 1:
                     self.turn = True
+                    self.moved = True
             pygame.display.update()
 
        self.client.close()
@@ -268,6 +269,53 @@ def handle_hover(self, screen):
     if hero_rect.collidepoint(mouse_pos) :
         screen.blit(self.opp_heroCard.image, card_display_place)
 
+    #battleground
+    space_for_line = self.screen.get_height() // 8
+
+    i = 0;
+    for card in self.MyFrontRow:
+        card_rect = pygame.Rect((screen.get_width() * 0.36 + (i * CARD_SIZE_X * 0.9),
+                                 (space_for_line * 4) + (space_for_line - CARD_SIZE_Y)),(CARD_SIZE_X, CARD_SIZE_Y))
+        if card_rect.collidepoint(mouse_pos):
+            screen.blit(card.image, card_display_place)
+        i+=1
+    i = 0;
+    for card in self.MyMiddleRow:
+        card_rect = pygame.Rect((screen.get_width() * 0.36 + (i * CARD_SIZE_X * 0.9),
+                                 (space_for_line * 5) + (space_for_line - CARD_SIZE_Y)),(CARD_SIZE_X, CARD_SIZE_Y))
+        if card_rect.collidepoint(mouse_pos):
+            screen.blit(card.image, card_display_place)
+        i += 1
+    i = 0;
+    for card in self.MyBackRow:
+        card_rect = pygame.Rect((screen.get_width() * 0.36 + (i * CARD_SIZE_X * 0.9),
+                                 (space_for_line * 6) + (space_for_line - CARD_SIZE_Y)),(CARD_SIZE_X, CARD_SIZE_Y))
+        if card_rect.collidepoint(mouse_pos):
+            screen.blit(card.image, card_display_place)
+        i += 1
+        # ================
+    i = 0;
+    for card in self.OppFrontRow:
+        card_rect = pygame.Rect((screen.get_width() * 0.36 + (i * CARD_SIZE_X * 0.9),
+                                 (space_for_line * 3) + (space_for_line - CARD_SIZE_Y)),(CARD_SIZE_X, CARD_SIZE_Y))
+        if card_rect.collidepoint(mouse_pos):
+            screen.blit(card.image, card_display_place)
+        i += 1
+    i = 0;
+    for card in self.OppMiddleRow:
+        card_rect = pygame.Rect((screen.get_width() * 0.36 + (i * CARD_SIZE_X * 0.9),
+                                 (space_for_line * 2) + (space_for_line - CARD_SIZE_Y)),(CARD_SIZE_X, CARD_SIZE_Y))
+        if card_rect.collidepoint(mouse_pos):
+            screen.blit(card.image, card_display_place)
+        i += 1
+    i = 0;
+    for card in self.OppBackRow:
+        card_rect = pygame.Rect((screen.get_width() * 0.36 + (i * CARD_SIZE_X * 0.9),
+                                 (space_for_line * 1) + (space_for_line - CARD_SIZE_Y)),(CARD_SIZE_X, CARD_SIZE_Y))
+        if card_rect.collidepoint(mouse_pos):
+            screen.blit(card.image, card_display_place)
+        i += 1
+    i = 0;
 def handle_click(self,screen):
     mouse_pos = pygame.mouse.get_pos()
     screen_width = screen.get_width()
@@ -304,16 +352,15 @@ def handle_click(self,screen):
     self.stopHover = True
 
 def falling_text(self,screen):
-    if self.turn == True:
-        text = "Twoj Ruch"
+    if self.turn:
+        text_surface = self.font_comic.render("Twoj ruch", True, "Green")
     else:
-        text = "Ruch przeciwnika"
-    text_surface = self.font_comic.render(text, True, "black")
+        text_surface = self.font_comic.render("Ruch przeciwnika", True, "Red")
     text_rect = text_surface.get_rect(center=(self.falling_text_x, screen.get_height()//2))
-    if self.falling_text_x >= screen.get_width()//2 and (0 <= self.timer <= 2):
+    if self.falling_text_x >= screen.get_width()//2 and (0 <= self.timer <= 3):
         self.timer += self.clock.tick(60) / 1000
     else:
-        self.falling_text_x += 50
+        self.falling_text_x += 100
     self.screen.blit(text_surface, text_rect)
 
 def checkIfMove(self,screen):
@@ -379,6 +426,8 @@ def prepare_battlefield(self):
     self.moved = False
     self.stopHover = False
     self.falling_text_x = 0
+    self.timer = 0
+    self.clock = pygame.time.Clock()
 
 
 def add_cards_to_List(self,mess,card_list):

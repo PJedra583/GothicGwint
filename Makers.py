@@ -16,7 +16,7 @@ class Makers:
         self.back_rect = self.back_text.get_rect(topleft=(20, 20))
 
         self.makers_items = \
-            ["Oprogramowanie: Piotr Jędra","Udźwiękowienie: Franciszek Kalinowski","Karty do gry: Bractwo Sposzczenia"]
+            ["Oprogramowanie: Piotr Jędra","Udźwiękowienie: Franciszek Kalinowski","Karty do gry: Quash"]
         self.makers_names = pygame.font.Font(font_path_comic, 40)
         self.makers_y = -300 # Początkowa pozycja dla pierwszego tekstu
         game_makers_screen = True

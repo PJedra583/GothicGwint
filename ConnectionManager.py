@@ -20,6 +20,8 @@ class ConnectionManager:
         self.player2_card_Deck = []
         self.player1_cards = []
         self.player2_cards = []
+        self.player1_stack = []
+        self.player2_stack = []
         self.player1_hero = None
         self.player2_hero = None
         self.player1_lifes = 2
@@ -28,6 +30,18 @@ class ConnectionManager:
         self.player2_score = 0
         self.player1_isHeroActive = True
         self.player2_isHeroActive = True
+
+        self.player1_choosing = False
+        self.player2_choosing = False
+
+        #upgrades
+        self.player1_upgrade_f = 0
+        self.player2_upgrade_f = 0
+        self.player1_upgrade_m = 0
+        self.player2_upgrade_m = 0
+        self.player1_upgrade_b = 0
+        self.player2_upgrade_b = 0
+
 
         #Battle row
         self.player1_frontRow = []
@@ -58,7 +72,6 @@ class ConnectionManager:
                 if not data:
                     break
                 message = data.decode("utf-8")
-              #  print("Zapytanie od gracza " + str(counter) + message)
                 if message == "Hello\n":
                     self.start = 2
                 elif message == "GetMyTurn\n":
@@ -107,6 +120,7 @@ class ConnectionManager:
                     card_id = int(message.split(";")[1])
                     row = message.split(";")[2]
                     if counter == 1:
+                        self.checkAndRealiseEffects(1, card_id, row)
                         self.player1_cards.remove(self.all_Cards[card_id])
                         if row == "f":
                             self.player1_frontRow.append(self.all_Cards[card_id])
@@ -115,6 +129,7 @@ class ConnectionManager:
                         elif row == "b":
                             self.player1_backRow.append(self.all_Cards[card_id])
                     if counter == 2:
+                        self.checkAndRealiseEffects(2, card_id, row)
                         self.player2_cards.remove(self.all_Cards[card_id])
                         if row == "f":
                             self.player2_frontRow.append(self.all_Cards[card_id])
@@ -255,3 +270,118 @@ class ConnectionManager:
             for card in self.player2_backRow:
                 sum += card.power
         return sum
+
+
+    def checkUpgrade(self,counter):
+        if counter == 1:
+         for card in self.player1_backRow:
+             for effect in card.effects:
+                if effect == 'upgrade':
+                     self.player1_upgrade_b += 1
+        if counter == 2:
+         for card in self.player2_backRow:
+             for effect in card.effects:
+                if effect == 'upgrade':
+                     self.player2_upgrade_b += 1
+
+    def activateUpgrade(self,counter):
+
+     pass
+    def releaseUpgrade(self,counter):
+     pass
+
+    def checkAndRealiseEffects(self,counter,card_id,pos):
+        card = self.all_Cards[card_id]
+        if counter == 1:
+            for effect in card.effects:
+                if effect == "spy":
+                    self.player1_cards.append(self.player1_card_Deck.pop(0))
+                if effect == "burn":
+                    sum = 0
+                    for card in self.player2_frontRow:
+                        sum += card.power
+
+                    max_power = 0
+                    for card in self.player2_frontRow:
+                        if card.power >= max_power:
+                            max_power = card.power
+                    for card in self.player2_middleRow:
+                        if card.power >= max_power:
+                            max_power = card.power
+                    for card in self.player2_backRow:
+                        if card.power >= max_power:
+                            max_power = card.power
+
+                    if sum >= 10:
+                        card_to_rem_f = []
+                        card_to_rem_m = []
+                        card_to_rem_b = []
+
+                        for card in self.player2_frontRow:
+                            if card.power == max_power:
+                                card_to_rem_f.append(card)
+                        for card in self.player2_middleRow:
+                            if card.power == max_power:
+                                card_to_rem_m.append(card)
+                        for card in self.player2_backRow:
+                            if card.power == max_power:
+                                card_to_rem_b.append(card)
+
+                        for card in card_to_rem_f:
+                            self.player2_stack.append(card)
+                            self.player2_frontRow.remove(card)
+                        for card in card_to_rem_m:
+                            self.player2_stack.append(card)
+                            self.player2_middleRow.remove(card)
+                        for card in card_to_rem_b:
+                            self.player2_stack.append(card)
+                            self.player2_backRow.remove(card)
+                if effect == "heal":
+                    self.player1_choosing = True
+        if counter == 2:
+            for effect in card.effects:
+                if effect == "spy":
+                    self.player2_cards.append(self.player2_card_Deck.pop(0))
+                if effect == "burn":
+                    sum = 0
+                    for card in self.player1_frontRow:
+                        sum += card.power
+
+                    max_power = 0
+                    for card in self.player1_frontRow:
+                        if card.power >= max_power:
+                            max_power = card.power
+                    for card in self.player1_middleRow:
+                        if card.power >= max_power:
+                            max_power = card.power
+                    for card in self.player1_backRow:
+                        if card.power >= max_power:
+                            max_power = card.power
+
+                    if sum >= 10:
+                        card_to_rem_f = []
+                        card_to_rem_m = []
+                        card_to_rem_b = []
+
+                        for card in self.player1_frontRow:
+                            if card.power == max_power:
+                                card_to_rem_f.append(card)
+                        for card in self.player1_middleRow:
+                            if card.power == max_power:
+                                card_to_rem_m.append(card)
+                        for card in self.player1_backRow:
+                            if card.power == max_power:
+                                card_to_rem_b.append(card)
+
+                        for card in card_to_rem_f:
+                            self.player1_stack.append(card)
+                            self.player1_frontRow.remove(card)
+                        for card in card_to_rem_m:
+                            self.player1_stack.append(card)
+                            self.player1_middleRow.remove(card)
+                        for card in card_to_rem_b:
+                            self.player1_stack.append(card)
+                            self.player1_backRow.remove(card)
+                if effect == "heal":
+                    self.player2_choosing = True
+        pass
