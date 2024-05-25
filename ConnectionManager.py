@@ -88,7 +88,6 @@ class ConnectionManager:
                     if counter == 2 :
                         client_socket.send((str(self.player2_turn) + "\n").encode("utf-8"))
                 elif message == "GetOppCardsLength\n":
-                    print(str(len(self.player2_cards)) + " || " + str(len(self.player1_cards)))
                     if counter == 1:
                         client_socket.send((str(len(self.player2_cards)) + "\n").encode("utf-8"))
                     if counter == 2:
@@ -309,6 +308,17 @@ class ConnectionManager:
 
         random.shuffle(self.heroPool)
         self.player2_hero = self.heroPool[0]
+
+        if (self.player1_hero.name == "Gomez" or self.player2_hero.name == "Gomez"):
+            self.player1_isHeroActive = "F"
+            self.player2_isHeroActive = "F"
+        else:
+            if self.player2_hero.name == "Rhobar":
+                self.player2_cards.append(self.player2_card_Deck.pop())
+                self.player2_isHeroActive = "F"
+            if self.player1_hero.name == "Rhobar":
+                self.player1_cards.append(self.player1_card_Deck.pop())
+                self.player1_isHeroActive = "F"
 
     def stop_server(self):
         for thread in self.client_threads:
