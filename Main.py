@@ -24,7 +24,7 @@ class Main:
         pygame.display.set_caption("Gothic Gwint")
 
     def run(self):
-        pygame.mixer.music.play()
+     #   pygame.mixer.music.play()
         menu_running = True
         while menu_running:
             for event in pygame.event.get():

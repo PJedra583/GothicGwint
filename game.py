@@ -5,6 +5,8 @@ import pygame
 import socket
 
 import ConnectionManager
+
+from GraphicEffects import GraphicEffects
 from Cursor import Cursor
 from Card import Card
 CARD_SIZE_X = 75
@@ -68,6 +70,27 @@ class Game:
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client.connect((self.server_ip, 8091))
 
+        #efekty
+        self.graphicEffects = GraphicEffects(screen)
+        self.graphicEffectsOpp = GraphicEffects(screen)
+
+        space_for_line = self.screen.get_height() // 8
+        rain_area = (int(screen.get_width() * 0.25), int(space_for_line * 6), int(screen.get_width()),
+                     int(space_for_line * 6)+int(space_for_line))
+        rain_area_opp = (int(screen.get_width() * 0.25), int(space_for_line * 1), int(screen.get_width()),
+                     int(space_for_line * 1) + int(space_for_line))
+        self.graphicEffects.make_rain(rain_area,250)
+        self.graphicEffectsOpp.make_rain(rain_area_opp, 250)
+
+        snow_area = (int(screen.get_width() * 0.25),int(space_for_line*3),int(screen.get_width()),
+                                                                int(space_for_line*3)+int(2*space_for_line))
+        self.graphicEffects.make_snow(snow_area,250)
+        fog_area = (int(screen.get_width() * 0.25), int(space_for_line * 5), int(screen.get_width()),
+                     int(space_for_line * 5)+int(space_for_line))
+        fog_area_opp = (int(screen.get_width() * 0.25), int(space_for_line * 2), int(screen.get_width()),
+                     int(space_for_line * 2)+int(space_for_line))
+        self.graphicEffects.make_fog(fog_area,100)
+        self.graphicEffectsOpp.make_fog(fog_area_opp,100)
 
     def run(self):
 
@@ -236,6 +259,18 @@ class Game:
                 self.screen.blit(image, (screen_width * 0.36+(i*CARD_SIZE_X*0.9),
                                                     (space_for_line*1) + (space_for_line-CARD_SIZE_Y)))
 
+            #pogoda
+            if self.weather[0] is 'T':
+                self.graphicEffects.draw_snow()
+            if self.weather[1] is 'T':
+                self.graphicEffects.draw_fog()
+                self.graphicEffectsOpp.draw_fog()
+            if self.weather[2] is 'T':
+                self.graphicEffects.draw_rain()
+                self.graphicEffectsOpp.draw_rain()
+
+
+
             #wybor pola
             if not self.stopHover :
                 handle_hover(self, self.screen)
@@ -243,7 +278,9 @@ class Game:
                 card_display_place = (self.screen.get_width() - 220, self.screen.get_height() // 2)
                 if self.card_to_display is not None:
                     for rect in self.rects_to_display:
-                        pygame.draw.rect(self.screen,(255, 255, 0),rect)
+                        surface = pygame.Surface((rect[2], rect[3]), pygame.SRCALPHA)
+                        pygame.draw.rect(surface, (255, 255, 0, 100), surface.get_rect())
+                        self.screen.blit(surface, (rect[0], rect[1]))
                     self.screen.blit(self.all_Cards[self.card_to_display].image, card_display_place)
                 elif self.hero_card_to_display is not None:
                     self.screen.blit(self.allHeroes[self.card_to_display].image, card_display_place)
@@ -364,10 +401,10 @@ def handle_click(self,screen):
                     self.rects_to_display.append((screen_width * 0.25, space_for_line * 4,
                                                   screen_width * 0.75, space_for_line))
                 elif card.name == "Deszcz":
-                    self.rects_to_display.append((screen_width * 0.25, space_for_line * 5,
+                    self.rects_to_display.append((screen_width * 0.25, space_for_line * 6,
                                                   screen_width * 0.75, space_for_line))
                 elif card.name == "Mgła":
-                    self.rects_to_display.append((screen_width * 0.25, space_for_line * 6,
+                    self.rects_to_display.append((screen_width * 0.25, space_for_line * 5,
                                                   screen_width * 0.75, space_for_line))
                 elif card.name == "Niebo":
                     self.rects_to_display.append((screen_width * 0.25, space_for_line * 4,
