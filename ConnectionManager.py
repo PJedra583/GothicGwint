@@ -33,7 +33,8 @@ class ConnectionManager:
 
         self.player1_choosing = False
         self.player2_choosing = False
-
+        self.player1_pass = False
+        self.player2_pass = False
         #upgrades
         self.player1_upgrade_f = 0
         self.player2_upgrade_f = 0
@@ -75,9 +76,13 @@ class ConnectionManager:
                 if message == "Hello\n":
                     self.start = 2
                 elif message == "GetMyTurn\n":
-                    if counter == 1:
+                    if self.player1_pass and self.player2_pass:
+                        self.player1_pass = False
+                        self.player2_pass = False
+                        self.endRound()
+                    if counter == 1 :
                         client_socket.send((str(self.player1_turn) + "\n").encode("utf-8"))
-                    if counter == 2:
+                    if counter == 2 :
                         client_socket.send((str(self.player2_turn) + "\n").encode("utf-8"))
                 elif message == "GetOppCardsLength\n":
                     print(str(len(self.player2_cards)) + " || " + str(len(self.player1_cards)))
@@ -137,10 +142,10 @@ class ConnectionManager:
                             self.player2_middleRow.append(self.all_Cards[card_id])
                         elif row == "b":
                             self.player2_backRow.append(self.all_Cards[card_id])
-                    if self.player1_turn == 1:
+                    if self.player1_turn == 1 and not self.player2_pass:
                         self.player1_turn = 0
                         self.player2_turn = 1
-                    else:
+                    elif self.player2_turn == 1 and not self.player1_pass:
                         self.player1_turn = 1
                         self.player2_turn = 0
                     client_socket.send(("OK\n").encode("utf-8"))
@@ -205,6 +210,17 @@ class ConnectionManager:
                         self.player1_score = self.calculate_power(1)
                         s = str(self.player1_score)
                         client_socket.send((s + "\n").encode("utf-8"))
+                elif message == "Pass\n":
+                    if counter == 1:
+                        self.player1_pass = True
+                        self.player1_turn = 0
+                        self.player2_turn = 1
+                        client_socket.send("Got message\n".encode("utf-8"))
+                    if counter == 2:
+                        self.player2_pass = True
+                        self.player1_turn = 1
+                        self.player2_turn = 0
+                        client_socket.send("Got message\n".encode("utf-8"))
                 else:
                     client_socket.send("Wrong Message\n".encode("utf-8"))
 
@@ -385,3 +401,48 @@ class ConnectionManager:
                 if effect == "heal":
                     self.player2_choosing = True
         pass
+    def endRound(self):
+        sum1 = self.calculate_power(1)
+        sum2 = self.calculate_power(2)
+        if sum1 == sum2:
+            self.player1_lifes -= 1
+            self.player2_lifes -= 1
+            coin = random.randint(0, 1)
+            if coin == 1:
+                self.player1_turn = 0
+                self.player2_turn = 1
+            else:
+                self.player1_turn = 1
+                self.player2_turn = 0
+        elif sum1 < sum2:
+            self.player1_lifes -= 1
+            self.player1_turn = 1
+            self.player2_turn = 0
+        elif sum1 > sum2:
+            self.player2_lifes -= 1
+            self.player1_turn = 0
+            self.player2_turn = 1
+
+        for card in self.player1_frontRow:
+            self.player1_stack.append(card)
+        self.player1_frontRow = []
+
+        for card in self.player1_middleRow:
+            self.player1_stack.append(card)
+        self.player1_middleRow = []
+
+        for card in self.player1_backRow:
+            self.player1_stack.append(card)
+        self.player1_backRow = []
+
+        for card in self.player2_frontRow:
+            self.player2_stack.append(card)
+        self.player2_frontRow = []
+
+        for card in self.player2_middleRow:
+            self.player2_stack.append(card)
+        self.player2_middleRow = []
+
+        for card in self.player2_backRow:
+            self.player2_stack.append(card)
+        self.player2_backRow = []

@@ -44,6 +44,8 @@ class Game:
         self.choosing = False
         self.clock = pygame.time.Clock()
         self.timer = 0
+        self.messageClock = pygame.time.Clock()
+        self.messageTimer = 0
         self.cardReverse = pygame.transform.scale(pygame.image.load("data/textures/rewers.jpg"),(CARD_SIZE_X,CARD_SIZE_Y))
         self.player_num = player
         self.stopHover = False
@@ -76,12 +78,16 @@ class Game:
 
        while running:
             if self.moved:
-                prepare_battlefield(self)
+                if self.turn:
+                 prepare_battlefield(self)
+                else:
+                 prepare_battlefield(self)
+                 self.moved = True
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:  # LMB
                         if self.turn :
-                         checkIfMove(self,self.screen)
+                         checkIfMove(self)
                         if self.turn :
                          self.rects_to_display = []
                          self.card_to_display = None
@@ -90,6 +96,12 @@ class Game:
                         self.rects_to_display = []
                         self.card_to_display = None
                         self.stopHover = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        if self.turn:
+                            send_mess(self,"Pass\n")
+                            self.turn = False
+                            self.moved = True
             self.screen.blit(self.background_image, self.background_image.get_rect())
 
             #Linia statystyk, karta bohatera gora,pasek wyniku przeciwnik, pasek wyniku gracz
@@ -231,7 +243,7 @@ class Game:
                 card_display_place = (self.screen.get_width() - 220, self.screen.get_height() // 2)
                 if self.card_to_display is not None:
                     for rect in self.rects_to_display:
-                        pygame.draw.rect(self.screen,(255, 255, 0, 255),rect)
+                        pygame.draw.rect(self.screen,(255, 255, 0),rect)
                     self.screen.blit(self.all_Cards[self.card_to_display].image, card_display_place)
                 elif self.hero_card_to_display is not None:
                     self.screen.blit(self.allHeroes[self.card_to_display].image, card_display_place)
@@ -241,10 +253,15 @@ class Game:
             self.cursor.draw(self.screen)
 
             if not self.turn:
-                s = send_mess(self,"GetMyTurn\n")
-                if int(s) == 1:
-                    self.turn = True
-                    self.moved = True
+                if self.messageTimer >= 1:
+                    s = send_mess(self, "GetMyTurn\n")
+                    self.messageTimer = 0
+                    self.messageClock = pygame.time.Clock()
+                    if int(s) == 1:
+                        self.turn = True
+                        #Because opponent has moved
+                        self.moved = True
+                self.messageTimer += self.messageClock.tick(60) / 1000
             pygame.display.update()
 
        self.client.close()
@@ -342,6 +359,23 @@ def handle_click(self,screen):
                                               screen_width * 0.75, space_for_line))
                 self.rects_to_display.append((screen_width * 0.25, space_for_line * 5,
                                               screen_width * 0.75, space_for_line))
+            elif card.type == "weather":
+                if card.name == "Mróz":
+                    self.rects_to_display.append((screen_width * 0.25, space_for_line * 4,
+                                                  screen_width * 0.75, space_for_line))
+                elif card.name == "Deszcz":
+                    self.rects_to_display.append((screen_width * 0.25, space_for_line * 5,
+                                                  screen_width * 0.75, space_for_line))
+                elif card.name == "Mgła":
+                    self.rects_to_display.append((screen_width * 0.25, space_for_line * 6,
+                                                  screen_width * 0.75, space_for_line))
+                elif card.name == "Niebo":
+                    self.rects_to_display.append((screen_width * 0.25, space_for_line * 4,
+                                                  screen_width * 0.75, space_for_line))
+                    self.rects_to_display.append((screen_width * 0.25, space_for_line * 5,
+                                                  screen_width * 0.75, space_for_line))
+                    self.rects_to_display.append((screen_width * 0.25, space_for_line * 6,
+                                                  screen_width * 0.75, space_for_line))
             self.card_to_display = card.id
         i+=1
     hero_rect = pygame.Rect(screen.get_width() * 0.025, screen.get_height() * 0.80,
@@ -363,7 +397,7 @@ def falling_text(self,screen):
         self.falling_text_x += 100
     self.screen.blit(text_surface, text_rect)
 
-def checkIfMove(self,screen):
+def checkIfMove(self):
     space_for_line = self.screen.get_height() // 8
     mouse_pos = pygame.mouse.get_pos()
     for rect in self.rects_to_display:
@@ -431,8 +465,6 @@ def prepare_battlefield(self):
 
 
 def add_cards_to_List(self,mess,card_list):
-
-  #  if ";" in mess:
      for i in mess.split(";"):
         if i.strip() != "":
             index = int(i)
@@ -450,8 +482,6 @@ def send_mess(self,mess):
 
     except Exception as e:
         return ""
-
-
 
 if __name__ == "__main__":
 
