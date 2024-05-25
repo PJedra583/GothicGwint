@@ -29,7 +29,7 @@ class ConnectionManager:
         self.player1_score = 0
         self.player2_score = 0
         self.player1_isHeroActive = "T"
-        self.player2_isHeroActive = "F"
+        self.player2_isHeroActive = "T"
 
         self.player1_choosing = False
         self.player2_choosing = False
