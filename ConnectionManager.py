@@ -43,7 +43,10 @@ class ConnectionManager:
         self.player1_upgrade_b = 0
         self.player2_upgrade_b = 0
 
-
+        #Weather
+        self.cold = 'F'
+        self.rain = 'F'
+        self.fog = 'F'
         #Battle row
         self.player1_frontRow = []
         self.player1_middleRow = []
@@ -121,27 +124,34 @@ class ConnectionManager:
                     if counter == 2:
                         client_socket.send((str(self.player1_lifes) + "\n").encode("utf-8"))
                 elif message[0] == "M":
+
                     #rzucanie karty
+
                     card_id = int(message.split(";")[1])
                     row = message.split(";")[2]
+                    c = self.all_Cards[card_id]
                     if counter == 1:
                         self.checkAndRealiseEffects(1, card_id, row)
-                        self.player1_cards.remove(self.all_Cards[card_id])
-                        if row == "f":
-                            self.player1_frontRow.append(self.all_Cards[card_id])
+                        self.player1_cards.remove(c)
+                        if c.type == "weather":
+                            self.realiseWeather(c)
+                        elif row == "f":
+                            self.player1_frontRow.append(c)
                         elif row == "m":
-                            self.player1_middleRow.append(self.all_Cards[card_id])
+                            self.player1_middleRow.append(c)
                         elif row == "b":
-                            self.player1_backRow.append(self.all_Cards[card_id])
+                            self.player1_backRow.append(c)
                     if counter == 2:
                         self.checkAndRealiseEffects(2, card_id, row)
-                        self.player2_cards.remove(self.all_Cards[card_id])
-                        if row == "f":
-                            self.player2_frontRow.append(self.all_Cards[card_id])
+                        self.player2_cards.remove(c)
+                        if c.type == "weather":
+                            self.realiseWeather(c)
+                        elif row == "f":
+                            self.player2_frontRow.append(c)
                         elif row == "m":
-                            self.player2_middleRow.append(self.all_Cards[card_id])
+                            self.player2_middleRow.append(c)
                         elif row == "b":
-                            self.player2_backRow.append(self.all_Cards[card_id])
+                            self.player2_backRow.append(c)
                     if self.player1_turn == 1 and not self.player2_pass:
                         self.player1_turn = 0
                         self.player2_turn = 1
@@ -149,6 +159,7 @@ class ConnectionManager:
                         self.player1_turn = 1
                         self.player2_turn = 0
                     client_socket.send(("OK\n").encode("utf-8"))
+
                 elif message == "GetMyFrontRow\n":
                     if counter == 1:
                         s = self.get_cards_as_string(self.player1_frontRow)
@@ -210,6 +221,9 @@ class ConnectionManager:
                         self.player1_score = self.calculate_power(1)
                         s = str(self.player1_score)
                         client_socket.send((s + "\n").encode("utf-8"))
+                elif message == "GetWeather\n":
+                    s = self.cold + self.fog + self.rain
+                    client_socket.send((s+"\n").encode("utf-8"))
                 elif message == "Pass\n":
                     if counter == 1:
                         self.player1_pass = True
@@ -401,6 +415,20 @@ class ConnectionManager:
                 if effect == "heal":
                     self.player2_choosing = True
         pass
+
+    def realiseWeather(self,c):
+        if c.name == "Mróz":
+            self.cold = 'T'
+        elif c.name == "Mgła":
+            self.fog = 'T'
+        elif c.name == "Deszcz":
+            self.rain = 'T'
+        elif c.name == "Niebo":
+            self.rain = 'F'
+            self.fog = 'F'
+            self.cold = 'F'
+
+
     def endRound(self):
         sum1 = self.calculate_power(1)
         sum2 = self.calculate_power(2)

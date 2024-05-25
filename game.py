@@ -63,7 +63,7 @@ class Game:
         self.OppMiddleRow = []
         self.OppBackRow = []
 
-
+        self.weather = "FFF"
         #polaczenie z serwerem
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client.connect((self.server_ip, 8091))
@@ -450,6 +450,8 @@ def prepare_battlefield(self):
 
     self.my_score = int(send_mess(self, "GetMyScore\n"))
     self.opp_score = int(send_mess(self, "GetOppScore\n"))
+
+    self.weather = send_mess(self, "GetWeather\n")
 
     turn = send_mess(self, "GetMyTurn\n")
     if int(turn.strip()) == 0:
