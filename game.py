@@ -116,19 +116,19 @@ class Game:
                  self.moved = True
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    self.stopHover = False
                     if event.button == 1:  # LMB
                         if self.turn :
                          checkIfMove(self)
-                        if self.turn :
                          self.rects_to_display = []
                          self.card_to_display = None
                          self.hero_card_to_display = None
                          handle_click(self,self.screen)
+                    #dla innych przycików myszy
                     else:
                         self.rects_to_display = []
                         self.card_to_display = None
                         self.hero_card_to_display = None
-                        self.stopHover = False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         if self.turn:
