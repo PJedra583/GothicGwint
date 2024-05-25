@@ -65,7 +65,15 @@ class Game:
         self.OppMiddleRow = []
         self.OppBackRow = []
 
+        self.myScores = None
+        self.oppScores = None
+
+        self.isHeroActive = None
+        self.isOppHeroActive = None
+
+
         self.weather = "FFF"
+
         #polaczenie z serwerem
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client.connect((self.server_ip, 8091))
@@ -114,10 +122,12 @@ class Game:
                         if self.turn :
                          self.rects_to_display = []
                          self.card_to_display = None
+                         self.hero_card_to_display = None
                          handle_click(self,self.screen)
                     else:
                         self.rects_to_display = []
                         self.card_to_display = None
+                        self.hero_card_to_display = None
                         self.stopHover = False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
@@ -148,6 +158,16 @@ class Game:
             hero = pygame.transform.scale(self.opp_heroCard.image, (CARD_SIZE_X, CARD_SIZE_Y))
             self.screen.blit(hero, (screen_width * 0.025, screen_height * 0.025,
                                     CARD_SIZE_X, CARD_SIZE_Y))
+            color = "white"
+            if self.isOppHeroActive.strip() == 'F':
+                color = "red"
+            pygame.draw.circle(self.screen,color,(screen_width * 0.025+CARD_SIZE_X+50,screen_height * 0.025+
+                                                  (CARD_SIZE_Y//2)),20)
+            color = "white"
+            if self.isHeroActive.strip() == 'F':
+                color = "red"
+            pygame.draw.circle(self.screen, color, (screen_width * 0.025 + CARD_SIZE_X + 50, screen_height * 0.8 +
+                                                    (CARD_SIZE_Y // 2)), 20)
 
             # Prostokat wyników
             pygame.draw.rect(self.screen, "black", (0, screen_height // 4, screen_width * 0.2, screen_height * 0.2))
@@ -218,6 +238,54 @@ class Game:
                                                       (screen_height * 0.1)))
             self.screen.blit(text_surface, text_rect)
 
+            #wyniki linie
+            pygame.draw.circle(self.screen, "white", (screen_width * 0.26, screen_height-
+                                                      (space_for_line*2)+space_for_line//2), 30)
+            text_surface = self.font.render(self.myScores.split(";")[2], True, "red")
+            text_rect = text_surface.get_rect(center=(screen_width * 0.26, screen_height-
+                                                      (space_for_line*2)+space_for_line//2))
+            self.screen.blit(text_surface, text_rect)
+
+
+            pygame.draw.circle(self.screen, "white", (screen_width * 0.26, screen_height -
+                                                      (space_for_line * 3) + space_for_line // 2), 30)
+            text_surface = self.font.render(self.myScores.split(";")[1], True, "green")
+            text_rect = text_surface.get_rect(center=(screen_width * 0.26, screen_height -
+                                                      (space_for_line * 3) + space_for_line // 2))
+            self.screen.blit(text_surface, text_rect)
+
+
+            pygame.draw.circle(self.screen, "white", (screen_width * 0.26, screen_height -
+                                                      (space_for_line * 4) + space_for_line // 2), 30)
+            text_surface = self.font.render(self.myScores.split(";")[0], True, "Blue")
+            text_rect = text_surface.get_rect(center=(screen_width * 0.26, screen_height -
+                                                      (space_for_line * 4) + space_for_line // 2))
+            self.screen.blit(text_surface, text_rect)
+
+            #=====================================
+
+            pygame.draw.circle(self.screen, "white", (screen_width * 0.26, screen_height -
+                                                      (space_for_line * 5) + space_for_line // 2), 30)
+            text_surface = self.font.render(self.oppScores.split(";")[0], True, "Blue")
+            text_rect = text_surface.get_rect(center=(screen_width * 0.26, screen_height -
+                                                      (space_for_line * 5) + space_for_line // 2))
+            self.screen.blit(text_surface, text_rect)
+
+            pygame.draw.circle(self.screen, "white", (screen_width * 0.26, screen_height -
+                                                      (space_for_line * 6) + space_for_line // 2), 30)
+            text_surface = self.font.render(self.oppScores.split(";")[1], True, "red")
+            text_rect = text_surface.get_rect(center=(screen_width * 0.26, screen_height -
+                                                      (space_for_line * 6) + space_for_line // 2))
+            self.screen.blit(text_surface, text_rect)
+
+
+            pygame.draw.circle(self.screen, "white", (screen_width * 0.26, screen_height -
+                                                      (space_for_line * 7) + space_for_line // 2), 30)
+            text_surface = self.font.render(self.oppScores.split(";")[2], True, "green")
+            text_rect = text_surface.get_rect(center=(screen_width * 0.26, screen_height -
+                                                      (space_for_line * 7) + space_for_line // 2))
+            self.screen.blit(text_surface, text_rect)
+
             #karty
             for i in range(len(self.my_cards)) :
                 scaled_image = pygame.transform.scale(self.my_cards[i].image, (CARD_SIZE_X, CARD_SIZE_Y))
@@ -260,16 +328,14 @@ class Game:
                                                     (space_for_line*1) + (space_for_line-CARD_SIZE_Y)))
 
             #pogoda
-            if self.weather[0] is 'T':
+            if self.weather[0] == 'T':
                 self.graphicEffects.draw_snow()
-            if self.weather[1] is 'T':
+            if self.weather[1] == 'T':
                 self.graphicEffects.draw_fog()
                 self.graphicEffectsOpp.draw_fog()
-            if self.weather[2] is 'T':
+            if self.weather[2] == 'T':
                 self.graphicEffects.draw_rain()
                 self.graphicEffectsOpp.draw_rain()
-
-
 
             #wybor pola
             if not self.stopHover :
@@ -283,7 +349,7 @@ class Game:
                         self.screen.blit(surface, (rect[0], rect[1]))
                     self.screen.blit(self.all_Cards[self.card_to_display].image, card_display_place)
                 elif self.hero_card_to_display is not None:
-                    self.screen.blit(self.allHeroes[self.card_to_display].image, card_display_place)
+                    self.screen.blit(self.allHeroes[self.hero_card_to_display].image, card_display_place)
 
             falling_text(self, self.screen)
             self.cursor.update()
@@ -379,6 +445,7 @@ def handle_click(self,screen):
         card_rect = (pygame.Rect((screen.get_width() * 0.26+(i*CARD_SIZE_X*0.9), screen.get_height() - CARD_SIZE_Y),
                                  (CARD_SIZE_X, CARD_SIZE_Y)))
         if card_rect.collidepoint(mouse_pos):
+            self.stopHover = True
             if len(self.rects_to_display) > 0:
                 self.rects_to_display = []
             space_for_line = self.screen.get_height() // 8
@@ -418,9 +485,11 @@ def handle_click(self,screen):
     hero_rect = pygame.Rect(screen.get_width() * 0.025, screen.get_height() * 0.80,
                                                     CARD_SIZE_X, CARD_SIZE_Y)
     if hero_rect.collidepoint(mouse_pos):
-        self.hero_card_to_display = self.heroCard
-        self.card_to_display = None
-    self.stopHover = True
+        if self.isHeroActive.strip() == 'T':
+            self.hero_card_to_display = self.heroCard.id
+            self.card_to_display = None
+            self.stopHover = True
+
 
 def falling_text(self,screen):
     if self.turn:
@@ -447,6 +516,11 @@ def checkIfMove(self):
             elif rect[1] == (space_for_line*6):
                 send_mess(self, "M;" + str(self.card_to_display) + ";" + "b" + ";\n")
             self.moved = True
+    print(self.isHeroActive.strip() + " = " + str(self.hero_card_to_display) )
+    if self.hero_card_to_display is not None and self.isHeroActive.strip() == "T":
+        send_mess(self, "H;" + str(self.hero_card_to_display) + ";"+"h"+";\n")
+        self.moved = True
+
 def prepare_battlefield(self):
     self.my_cards = []
     s = send_mess(self,"GetMyCards\n")
@@ -488,7 +562,13 @@ def prepare_battlefield(self):
     self.my_score = int(send_mess(self, "GetMyScore\n"))
     self.opp_score = int(send_mess(self, "GetOppScore\n"))
 
+    self.myScores = send_mess(self,"GetMyScores\n")
+    self.oppScores = send_mess(self,"GetOppScores\n")
+
     self.weather = send_mess(self, "GetWeather\n")
+
+    self.isHeroActive = send_mess(self, "GetIsHeroActive\n")
+    self.isOppHeroActive = send_mess(self, "GetIsOppHeroActive\n")
 
     turn = send_mess(self, "GetMyTurn\n")
     if int(turn.strip()) == 0:

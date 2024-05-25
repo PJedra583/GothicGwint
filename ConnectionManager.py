@@ -28,8 +28,8 @@ class ConnectionManager:
         self.player2_lifes = 2
         self.player1_score = 0
         self.player2_score = 0
-        self.player1_isHeroActive = True
-        self.player2_isHeroActive = True
+        self.player1_isHeroActive = "T"
+        self.player2_isHeroActive = "F"
 
         self.player1_choosing = False
         self.player2_choosing = False
@@ -126,7 +126,6 @@ class ConnectionManager:
                 elif message[0] == "M":
 
                     #rzucanie karty
-
                     card_id = int(message.split(";")[1])
                     row = message.split(";")[2]
                     c = self.all_Cards[card_id]
@@ -159,7 +158,18 @@ class ConnectionManager:
                         self.player1_turn = 1
                         self.player2_turn = 0
                     client_socket.send(("OK\n").encode("utf-8"))
-
+                elif message[0] == "H":
+                    if counter == 1:
+                        self.player1_isHeroActive = 'F'
+                    if counter == 2:
+                        self.player2_isHeroActive = 'F'
+                    if self.player1_turn == 1 and not self.player2_pass:
+                        self.player1_turn = 0
+                        self.player2_turn = 1
+                    elif self.player2_turn == 1 and not self.player1_pass:
+                        self.player1_turn = 1
+                        self.player2_turn = 0
+                    client_socket.send(("OK\n").encode("utf-8"))
                 elif message == "GetMyFrontRow\n":
                     if counter == 1:
                         s = self.get_cards_as_string(self.player1_frontRow)
@@ -221,9 +231,37 @@ class ConnectionManager:
                         self.player1_score = self.calculate_power(1)
                         s = str(self.player1_score)
                         client_socket.send((s + "\n").encode("utf-8"))
+                elif message == "GetMyScores\n":
+                    if counter == 1:
+                        s = self.calculate_power(1,"str")
+                        client_socket.send((s+"\n").encode("utf-8"))
+                    if counter == 2:
+                        s = self.calculate_power(2, "str")
+                        client_socket.send((s + "\n").encode("utf-8"))
+                elif message == "GetOppScores\n":
+                    if counter == 1:
+                        s = self.calculate_power(2,"str")
+                        client_socket.send((s+"\n").encode("utf-8"))
+                    if counter == 2:
+                        s = self.calculate_power(1, "str")
+                        client_socket.send((s + "\n").encode("utf-8"))
                 elif message == "GetWeather\n":
                     s = self.cold + self.fog + self.rain
                     client_socket.send((s+"\n").encode("utf-8"))
+                elif message == "GetIsHeroActive\n":
+                    if counter == 1:
+                        s = self.player1_isHeroActive
+                        client_socket.send((s+"\n").encode("utf-8"))
+                    if counter == 2:
+                        s = self.player2_isHeroActive
+                        client_socket.send((s + "\n").encode("utf-8"))
+                elif message == "GetIsOppHeroActive\n":
+                    if counter == 1:
+                        s = self.player2_isHeroActive
+                        client_socket.send((s+"\n").encode("utf-8"))
+                    if counter == 2:
+                        s = self.player1_isHeroActive
+                        client_socket.send((s + "\n").encode("utf-8"))
                 elif message == "Pass\n":
                     if counter == 1:
                         self.player1_pass = True
@@ -283,22 +321,42 @@ class ConnectionManager:
             s += str(card.id) + ";"
         return s
 
-    def calculate_power(self,counter):
+    def calculate_power(self,counter,form='int'):
         sum = 0
+        line_sum = 0
+        s = ''
         if counter == 1:
             for card in self.player1_frontRow:
                 sum += card.power
+                line_sum += card.power
+            s += str(line_sum) + ";"
+            line_sum = 0
             for card in self.player1_middleRow:
                 sum += card.power
+                line_sum += card.power
+            s += str(line_sum) + ";"
+            line_sum = 0
             for card in self.player1_backRow:
                 sum += card.power
+                line_sum += card.power
+            s += str(line_sum) + ";"
         if counter == 2:
             for card in self.player2_frontRow:
                 sum += card.power
+                line_sum += card.power
+            s += str(line_sum) + ";"
+            line_sum = 0
             for card in self.player2_middleRow:
                 sum += card.power
+                line_sum += card.power
+            s += str(line_sum) + ";"
+            line_sum = 0
             for card in self.player2_backRow:
                 sum += card.power
+                line_sum += card.power
+            s += str(line_sum) + ";"
+        if form == 'str':
+            return s
         return sum
 
 
