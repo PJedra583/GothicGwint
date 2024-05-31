@@ -13,6 +13,7 @@ class ConnectionManager:
         self.player1_turn = None
         self.player2_turn = None
         self.all_Cards = None
+        self.all_Heroes = None
         self.cardInstance = Card.getInstance()
         self.start = 1
         self.heroPool = []
@@ -43,6 +44,14 @@ class ConnectionManager:
         self.player1_upgrade_b = 0
         self.player2_upgrade_b = 0
 
+        #multiply
+        self.player1_multiply_f = 0
+        self.player2_multiply_f = 0
+        self.player1_multiply_m = 0
+        self.player2_multiply_m = 0
+        self.player1_multiply_b = 0
+        self.player2_multiply_b = 0
+
         #Weather
         self.cold = 'F'
         self.rain = 'F'
@@ -62,6 +71,7 @@ class ConnectionManager:
         self.server_socket.listen(5)
         self.cardInstance.load_cards()
         self.all_Cards = self.cardInstance.getSortedDeck()
+        self.all_Heroes = self.cardInstance.getHeroes()
         self.PrepareGame()
         while True:
             client_socket, client_address = self.server_socket.accept()
@@ -123,7 +133,6 @@ class ConnectionManager:
                     if counter == 2:
                         client_socket.send((str(self.player1_lifes) + "\n").encode("utf-8"))
                 elif message[0] == "M":
-
                     #rzucanie karty
                     card_id = int(message.split(";")[1])
                     row = message.split(";")[2]
@@ -150,18 +159,70 @@ class ConnectionManager:
                             self.player2_middleRow.append(c)
                         elif row == "b":
                             self.player2_backRow.append(c)
-                    if self.player1_turn == 1 and not self.player2_pass:
-                        self.player1_turn = 0
-                        self.player2_turn = 1
-                    elif self.player2_turn == 1 and not self.player1_pass:
-                        self.player1_turn = 1
-                        self.player2_turn = 0
-                    client_socket.send(("OK\n").encode("utf-8"))
+                    if "heal" in c.effects:
+                        client_socket.send(("Waiting\n").encode("utf-8"))
+                    else:
+                        if self.player1_turn == 1 and not self.player2_pass:
+                                self.player1_turn = 0
+                                self.player2_turn = 1
+                        elif self.player2_turn == 1 and not self.player1_pass:
+                                self.player1_turn = 1
+                                self.player2_turn = 0
+                        client_socket.send(("OK\n").encode("utf-8"))
                 elif message[0] == "H":
+                    c = self.all_Heroes[int(message.split(";")[1])]
                     if counter == 1:
                         self.player1_isHeroActive = 'F'
+                        if c.name == "Hagen":
+                            self.player1_multiply_f = 1
+                        elif c.name == "Lee":
+                            max = 0;
+                            to_rem = []
+                            for i in self.player2_middleRow:
+                                if i.power > max:
+                                    max = i.power
+                            print("max = " + str(max))
+                            for i in self.player2_middleRow:
+                                if i.power == max:
+                                    to_rem.append(i)
+                            for i in to_rem:
+                                self.player2_middleRow.remove(i)
+                                self.player2_stack.append(i)
+                        elif c.name == "Angar":
+                            self.player1_choosing = True
                     if counter == 2:
                         self.player2_isHeroActive = 'F'
+                        if c.name == "Hagen":
+                            self.player2_multiply_f = 1
+                        elif c.name == "Lee":
+                            max = 0;
+                            to_rem = []
+                            for i in self.player1_middleRow:
+                                if i.power > max:
+                                    max = i.power
+                            for i in self.player1_middleRow:
+                                if i.power == max:
+                                    to_rem.append(i)
+                            for i in to_rem:
+                                self.player1_middleRow.remove(i)
+                                self.player1_stack.append(i)
+                        elif c.name == "Angar":
+                            self.player2_choosing = True
+                    if self.player1_choosing or self.player2_choosing :
+                        client_socket.send(("WaitingForWeather\n").encode("utf-8"))
+                    else:
+                        if self.player1_turn == 1 and not self.player2_pass:
+                            self.player1_turn = 0
+                            self.player2_turn = 1
+                        elif self.player2_turn == 1 and not self.player1_pass:
+                            self.player1_turn = 1
+                            self.player2_turn = 0
+                        client_socket.send(("OK\n").encode("utf-8"))
+                elif message[0] == "E":
+                    if counter == 1:
+                        self.player1_choosing = False
+                    elif counter == 2:
+                        self.player2_choosing = False
                     if self.player1_turn == 1 and not self.player2_pass:
                         self.player1_turn = 0
                         self.player2_turn = 1

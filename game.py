@@ -41,9 +41,10 @@ class Game:
         self.hp = 2
         self.opp_hp = 2
         self.falling_text_x = 0
-        self.turn_notif = True
         self.turn = None
         self.choosing = False
+        self.pos_in_choose = 0
+        self.cards_in_choose = []
         self.clock = pygame.time.Clock()
         self.timer = 0
         self.messageClock = pygame.time.Clock()
@@ -113,7 +114,23 @@ class Game:
                  prepare_battlefield(self)
                 else:
                  prepare_battlefield(self)
+                 #because opp has moved
                  self.moved = True
+            if self.choosing:
+                if len(self.cards_in_choose) == 0:
+                    send_mess(self, "E" + ";\n")
+                    self.choosing = False
+                    self.moved = True
+                    self.cards_in_choose = []
+                else:
+                    if self.pos_in_choose < 0:
+                        self.pos_in_choose = len(self.cards_in_choose) - 1
+                    if self.pos_in_choose == len(self.cards_in_choose):
+                        self.pos_in_choose = 0
+                    c = self.cards_in_choose[self.pos_in_choose]
+                    print("blitujemy" + str(self.pos_in_choose))
+                    self.screen.blit(c.image, c.image.get_rect(center=(self.screen.get_width() // 2,
+                                                                      self.screen.get_height() // 2)))
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     self.stopHover = False
@@ -130,7 +147,25 @@ class Game:
                         self.card_to_display = None
                         self.hero_card_to_display = None
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
+                    if event.key == pygame.K_RIGHT:
+                        self.pos_in_choose+=1
+                    elif event.key == pygame.K_LEFT:
+                        self.pos_in_choose-=1
+                    elif event.key == pygame.K_RETURN:
+                        if self.choosing:
+                            cardType = self.cards_in_choose[self.pos_in_choose].type
+                            pos = 'w'
+                            if cardType == "front" or cardType == "mixed":
+                                pos = "f"
+                            if cardType == "middle":
+                                pos = "m"
+                            if cardType == "back":
+                                pos = "b"
+                            send_mess(self, "M;" + str(self.cards_in_choose[self.pos_in_choose].id) + pos + ";\n")
+                            self.choosing = False
+                            self.cards_in_choose = []
+                            self.moved = True
+                    elif event.key == pygame.K_SPACE:
                         if self.turn:
                             send_mess(self,"Pass\n")
                             self.turn = False
@@ -162,12 +197,12 @@ class Game:
             if self.isOppHeroActive.strip() == 'F':
                 color = "red"
             pygame.draw.circle(self.screen,color,(screen_width * 0.025+CARD_SIZE_X+50,screen_height * 0.025+
-                                                  (CARD_SIZE_Y//2)),20)
+                                                  (CARD_SIZE_Y//2)),12)
             color = "white"
             if self.isHeroActive.strip() == 'F':
                 color = "red"
             pygame.draw.circle(self.screen, color, (screen_width * 0.025 + CARD_SIZE_X + 50, screen_height * 0.8 +
-                                                    (CARD_SIZE_Y // 2)), 20)
+                                                    (CARD_SIZE_Y // 2)), 12)
 
             # Prostokat wyników
             pygame.draw.rect(self.screen, "black", (0, screen_height // 4, screen_width * 0.2, screen_height * 0.2))
@@ -506,20 +541,30 @@ def falling_text(self,screen):
 def checkIfMove(self):
     space_for_line = self.screen.get_height() // 8
     mouse_pos = pygame.mouse.get_pos()
+    received_message = ''
     for rect in self.rects_to_display:
         rect_obj = pygame.Rect(rect)
         if rect_obj.collidepoint(mouse_pos):
             if rect[1] == (space_for_line * 4):
-                send_mess(self, "M;" + str(self.card_to_display) + ";" + "f" + ";\n")
+                received_message = send_mess(self, "M;" + str(self.card_to_display) + ";" + "f" + ";\n")
             elif rect[1] == (space_for_line*5):
-                send_mess(self, "M;" + str(self.card_to_display) + ";" + "m" + ";\n")
+                received_message = send_mess(self, "M;" + str(self.card_to_display) + ";" + "m" + ";\n")
             elif rect[1] == (space_for_line*6):
-                send_mess(self, "M;" + str(self.card_to_display) + ";" + "b" + ";\n")
-            self.moved = True
-    print(self.isHeroActive.strip() + " = " + str(self.hero_card_to_display) )
+                received_message = send_mess(self, "M;" + str(self.card_to_display) + ";" + "b" + ";\n")
+            if "heal" in self.all_Cards[self.card_to_display].effects:
+                print("Zagrano karte z leczeniem")
+                self.choosing = True
+            else:
+                self.moved = True
     if self.hero_card_to_display is not None and self.isHeroActive.strip() == "T":
-        send_mess(self, "H;" + str(self.hero_card_to_display) + ";"+"h"+";\n")
-        self.moved = True
+        received_message = send_mess(self, "H;" + str(self.hero_card_to_display) + ";"+"h"+";\n")
+        if received_message.strip() == "WaitingForWeather":
+            for i in self.all_Cards:
+                if i.name == "Deszcz" or i.name == "Mgła" or i.name == "Mróz":
+                    self.cards_in_choose.append(i)
+            self.choosing = True
+        else:
+            self.moved = True
 
 def prepare_battlefield(self):
     self.my_cards = []

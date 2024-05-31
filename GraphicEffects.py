@@ -19,7 +19,7 @@ class GraphicEffects:
 
         for i in range(rain_drop_count):
             x = random.randint(x_min, x_max)
-            y = y_min - 20
+            y = random.randint(0, y_max)
             speed = random.randint(4, 16)
             self.rain_drops.append([x, y, speed])
 
