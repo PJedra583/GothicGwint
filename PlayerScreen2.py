@@ -52,6 +52,8 @@ class PlayerScreen2:
                 ip = self.getLocalIP()
                 g = game.Game(screen, ip, 2)
                 g.run()
+                running = False
+                print("ended succ")
             elif self.connectionManager.start == 3:
                 running = False
 

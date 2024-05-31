@@ -106,6 +106,11 @@ class Game:
         self.graphicEffects.make_fog(fog_area,100)
         self.graphicEffectsOpp.make_fog(fog_area_opp,100)
 
+        self.endGame = False
+        self.endGameText=''
+        self.endGameClock=pygame.time.Clock()
+        self.endGameTimer=0
+
     def run(self):
 
        prepare_battlefield(self)
@@ -152,7 +157,9 @@ class Game:
                                 pos = "m"
                             if cardType == "back":
                                 pos = "b"
-                            send_mess(self, "M;" + str(self.cards_in_choose[self.pos_in_choose].id) + ";" + pos + ";\n")
+                            mess = send_mess(self, "M;" + str(self.cards_in_choose[self.pos_in_choose].id) + ";" + pos + ";\n")
+                            if mess.strip() == "Waiting":
+                                send_mess(self, "E" + ";\n")
                             self.choosing = False
                             self.cards_in_choose = []
                             self.moved = True
@@ -163,21 +170,6 @@ class Game:
                             self.moved = True
             self.screen.blit(self.background_image, self.background_image.get_rect())
 
-            #Ekran wyboru
-            if self.choosing:
-                if len(self.cards_in_choose) == 0:
-                        send_mess(self, "E" + ";\n")
-                        self.choosing = False
-                        self.moved = True
-                        self.cards_in_choose = []
-                else:
-                    if self.pos_in_choose < 0:
-                        self.pos_in_choose = len(self.cards_in_choose) - 1
-                    if self.pos_in_choose >= len(self.cards_in_choose):
-                        self.pos_in_choose = 0
-                    c = self.cards_in_choose[self.pos_in_choose]
-                    self.screen.blit(c.image, c.image.get_rect(center=(self.screen.get_width() // 2,
-                                                                       self.screen.get_height() // 2)))
 
             #Linia statystyk, karta bohatera gora,pasek wyniku przeciwnik, pasek wyniku gracz
             #karta bohatera dol,kolo gora, kolo dol
@@ -406,6 +398,22 @@ class Game:
                 self.graphicEffects.draw_rain()
                 self.graphicEffectsOpp.draw_rain()
 
+                # Ekran wyboru
+                if self.choosing:
+                    if len(self.cards_in_choose) == 0:
+                        send_mess(self, "E" + ";\n")
+                        self.choosing = False
+                        self.moved = True
+                        self.cards_in_choose = []
+                    else:
+                        if self.pos_in_choose < 0:
+                            self.pos_in_choose = len(self.cards_in_choose) - 1
+                        if self.pos_in_choose >= len(self.cards_in_choose):
+                            self.pos_in_choose = 0
+                        c = self.cards_in_choose[self.pos_in_choose]
+                        self.screen.blit(c.image, c.image.get_rect(center=(self.screen.get_width() // 2,
+                                                                           self.screen.get_height() // 2)))
+
             #wybor pola
             if not self.stopHover :
                 handle_hover(self, self.screen)
@@ -423,19 +431,25 @@ class Game:
             falling_text(self, self.screen)
             self.cursor.update()
             self.cursor.draw(self.screen)
-
-            if not self.turn:
-                if self.messageTimer >= 1:
-                    s = send_mess(self, "GetMyTurn\n")
-                    self.messageTimer = 0
-                    self.messageClock = pygame.time.Clock()
-                    if int(s) == 1:
-                        self.turn = True
-                        self.moved = True
-                self.messageTimer += self.messageClock.tick(60) / 1000
+            if not self.endGame:
+                if not self.turn:
+                    if self.messageTimer >= 1:
+                        s = send_mess(self, "GetMyTurn\n")
+                        self.messageTimer = 0
+                        self.messageClock = pygame.time.Clock()
+                        if int(s) == 1:
+                            self.turn = True
+                            self.moved = True
+                    self.messageTimer += self.messageClock.tick(60) / 1000
+            else:
+                if self.endGameTimer == 0 and self.player == 2:
+                    send_mess(self, "Close\n")
+                self.endGameTimer += self.endGameClock.tick(60) / 1000
+                text = self.font_comic.render(self.endGameText,True,(255,255,255))
+                self.screen.blit(text,text.get_rect(center=(self.screen.get_width()//2,self.screen.get_height()//2)))
+                if self.endGameTimer >= 5:
+                    running = False
             pygame.display.update()
-
-       self.client.close()
 
 
 def handle_hover(self, screen):
@@ -566,7 +580,7 @@ def handle_click(self,screen):
             self.stopHover = True
 
 def falling_text(self,screen):
-    if not self.passed:
+    if not (self.passed or self.endGame):
         if self.turn:
             text_surface = self.font_comic.render("Twoj ruch", True, "Green")
         else:
@@ -650,6 +664,17 @@ def prepare_battlefield(self):
 
     self.hp = int(send_mess(self, "GetMyHP\n"))
     self.opp_hp = int(send_mess(self, "GetOppHP\n"))
+
+    if self.hp == self.opp_hp == 0:
+        self.endGame = True
+        self.endGameText = "REMIS"
+    elif self.hp == 0:
+        self.endGame = True
+        self.endGameText = "PORAŻKA"
+    elif self.opp_hp == 0:
+        self.endGame = True
+        self.endGameText = "WYGRANA!!!"
+
 
     self.my_score = int(send_mess(self, "GetMyScore\n"))
     self.opp_score = int(send_mess(self, "GetOppScore\n"))

@@ -19,9 +19,9 @@ class PlayerScreen:
         self.connect_text = self.font_gothic.render("Polacz", True, "BLack")
 
         self.back_text_rect = self.back_text.get_rect(
-            topleft=(screen.get_width() // 2.5 + 30, screen.get_height() // 4 + 350))
+            center=(screen.get_width() // 2 - screen.get_width()*0.05, screen.get_height() // 2 + screen.get_height()*0.15))
         self.connect_text_rect = self.connect_text.get_rect(
-            topleft=(screen.get_width() // 2.5 + 200, screen.get_height() // 4 + 350))
+            center=(screen.get_width() // 2 + (screen.get_width()*0.05), screen.get_height() // 2 + screen.get_height()*0.15))
 
         running = True
         input_text = "192.168.1.26"
@@ -34,6 +34,7 @@ class PlayerScreen:
                         if(self.test_connection(input_text)):
                             g = game.Game(screen, input_text, 1)
                             g.run()
+                            running = False
                         else:
                             self.display_text = "Bledny adres IP"
                     elif event.key == pygame.K_BACKSPACE:
@@ -47,23 +48,28 @@ class PlayerScreen:
                         if (self.test_connection(input_text)):
                             g = game.Game(screen,input_text,1)
                             g.run()
+                            running = False
                         else:
                             self.display_text = "Bledny adres IP"
                         input_text = ""
 
             #Kolejnosc rysowania istotna
-            pygame.draw.rect(screen,(217,186,140),(screen.get_width() //2.5  ,
-                                                   screen.get_height() //4 ,300,400))
-            pygame.draw.rect(screen,"Gold",(screen.get_width() //2.5  ,screen.get_height() //4 ,300,400),
+            pygame.draw.rect(screen,(217,186,140),(screen.get_width() //2 - (screen.get_width()*0.1)  ,
+                                                   screen.get_height() //2 - (screen.get_height()*0.2)
+                                                   ,screen.get_width()*0.2,screen.get_height()*0.4))
+            pygame.draw.rect(screen,"Gold",(screen.get_width() //2 - (screen.get_width()*0.1)  ,
+                                                   screen.get_height() //2 - (screen.get_height()*0.2)
+                                                   ,screen.get_width()*0.2,screen.get_height()*0.4),
                              10)
 
 
             text_surface = self.font_gothic.render(self.display_text, True, "Black")
-            text_rect = text_surface.get_rect(center=(screen.get_width() // 2, screen.get_height() // 3))
+            text_rect = text_surface.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2 -
+                                                      (screen.get_height()*0.2)+20))
             screen.blit(text_surface, text_rect)
 
             text_surface = self.font.render(input_text, True, "BLack")
-            text_rect = text_surface.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2.5))
+            text_rect = text_surface.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2-(screen.get_height()*0.1)))
             screen.blit(text_surface, text_rect)
 
             screen.blit(self.back_text,self.back_text_rect)

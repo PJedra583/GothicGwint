@@ -25,8 +25,8 @@ class ConnectionManager:
         self.player2_stack = []
         self.player1_hero = None
         self.player2_hero = None
-        self.player1_lifes = 2
-        self.player2_lifes = 2
+        self.player1_lifes = 0
+        self.player2_lifes = 0
         self.player1_score = 0
         self.player2_score = 0
         self.player1_isHeroActive = "T"
@@ -138,9 +138,9 @@ class ConnectionManager:
                     row = message.split(";")[2]
                     c = self.all_Cards[card_id]
                     if counter == 1:
+                        self.checkAndRealiseEffects(1, card_id, row)
                         self.checkUpgrade(1)
                         if not self.player1_choosing:
-                            self.checkAndRealiseEffects(1, card_id, row)
                             self.player1_cards.remove(c)
                         if c.type == "weather":
                             self.realiseWeather(c)
@@ -153,9 +153,9 @@ class ConnectionManager:
                         elif row == "b":
                             self.player1_backRow.append(c)
                     if counter == 2:
+                        self.checkAndRealiseEffects(2, card_id, row)
                         self.checkUpgrade(2)
                         if not self.player2_choosing:
-                            self.checkAndRealiseEffects(2, card_id, row)
                             self.player2_cards.remove(c)
                         if c.type == "weather":
                             self.realiseWeather(c)
@@ -167,9 +167,13 @@ class ConnectionManager:
                             self.player2_middleRow.append(c)
                         elif row == "b":
                             self.player2_backRow.append(c)
-                    if "heal" in c.effects and not (self.player1_choosing or self.player2_choosing):
+                    if "heal" in c.effects:
                         client_socket.send(("Waiting\n").encode("utf-8"))
-                    if not (self.player1_choosing or self.player2_choosing):
+                    elif self.player1_choosing:
+                        self.player1_choosing = False
+                    elif self.player2_choosing:
+                        self.player2_choosing = False
+                    if not "heal" in c.effects:
                         if self.player1_turn == 1 and not self.player2_pass:
                                 self.player1_turn = 0
                                 self.player2_turn = 1
@@ -177,10 +181,6 @@ class ConnectionManager:
                                 self.player1_turn = 1
                                 self.player2_turn = 0
                         client_socket.send(("OK\n").encode("utf-8"))
-                    if self.player1_choosing:
-                        self.player1_choosing = False
-                    if self.player2_choosing:
-                        self.player2_choosing = False
                 elif message[0] == "H":
                     c = self.all_Heroes[int(message.split(";")[1])]
                     if counter == 1:
@@ -408,6 +408,9 @@ class ConnectionManager:
                         self.player1_turn = 1
                         self.player2_turn = 0
                         client_socket.send("Got message\n".encode("utf-8"))
+                elif message == "Close\n":
+                    client_socket.send("Closing\n".encode("utf-8"))
+                    self.stop_server()
                 else:
                     client_socket.send("Wrong Message\n".encode("utf-8"))
         except Exception as e:
