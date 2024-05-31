@@ -45,12 +45,12 @@ class ConnectionManager:
         self.player2_upgrade_b = 0
 
         #multiply
-        self.player1_multiply_f = 0
-        self.player2_multiply_f = 0
-        self.player1_multiply_m = 0
-        self.player2_multiply_m = 0
-        self.player1_multiply_b = 0
-        self.player2_multiply_b = 0
+        self.player1_multiply_f = 1
+        self.player2_multiply_f = 1
+        self.player1_multiply_m = 1
+        self.player2_multiply_m = 1
+        self.player1_multiply_b = 1
+        self.player2_multiply_b = 1
 
         #Weather
         self.cold = 'F'
@@ -138,10 +138,14 @@ class ConnectionManager:
                     row = message.split(";")[2]
                     c = self.all_Cards[card_id]
                     if counter == 1:
-                        self.checkAndRealiseEffects(1, card_id, row)
-                        self.player1_cards.remove(c)
+                        self.checkUpgrade(1)
+                        if not self.player1_choosing:
+                            self.checkAndRealiseEffects(1, card_id, row)
+                            self.player1_cards.remove(c)
                         if c.type == "weather":
                             self.realiseWeather(c)
+                        if c.name == "In Extremo":
+                            self.realiseToAttack(counter,row)
                         elif row == "f":
                             self.player1_frontRow.append(c)
                         elif row == "m":
@@ -149,19 +153,23 @@ class ConnectionManager:
                         elif row == "b":
                             self.player1_backRow.append(c)
                     if counter == 2:
-                        self.checkAndRealiseEffects(2, card_id, row)
-                        self.player2_cards.remove(c)
+                        self.checkUpgrade(2)
+                        if not self.player2_choosing:
+                            self.checkAndRealiseEffects(2, card_id, row)
+                            self.player2_cards.remove(c)
                         if c.type == "weather":
                             self.realiseWeather(c)
+                        if c.name == "In Extremo":
+                            self.realiseToAttack(counter,row)
                         elif row == "f":
                             self.player2_frontRow.append(c)
                         elif row == "m":
                             self.player2_middleRow.append(c)
                         elif row == "b":
                             self.player2_backRow.append(c)
-                    if "heal" in c.effects:
+                    if "heal" in c.effects and not (self.player1_choosing or self.player2_choosing):
                         client_socket.send(("Waiting\n").encode("utf-8"))
-                    else:
+                    if not (self.player1_choosing or self.player2_choosing):
                         if self.player1_turn == 1 and not self.player2_pass:
                                 self.player1_turn = 0
                                 self.player2_turn = 1
@@ -169,12 +177,16 @@ class ConnectionManager:
                                 self.player1_turn = 1
                                 self.player2_turn = 0
                         client_socket.send(("OK\n").encode("utf-8"))
+                    if self.player1_choosing:
+                        self.player1_choosing = False
+                    if self.player2_choosing:
+                        self.player2_choosing = False
                 elif message[0] == "H":
                     c = self.all_Heroes[int(message.split(";")[1])]
                     if counter == 1:
                         self.player1_isHeroActive = 'F'
                         if c.name == "Hagen":
-                            self.player1_multiply_f = 1
+                            self.player1_multiply_f = 2
                         elif c.name == "Lee":
                             max = 0;
                             to_rem = []
@@ -186,14 +198,15 @@ class ConnectionManager:
                                 if i.power == max:
                                     to_rem.append(i)
                             for i in to_rem:
-                                self.player2_middleRow.remove(i)
-                                self.player2_stack.append(i)
+                                if "hero" not in i.effects:
+                                    self.player2_middleRow.remove(i)
+                                    self.player2_stack.append(i)
                         elif c.name == "Angar":
                             self.player1_choosing = True
                     if counter == 2:
                         self.player2_isHeroActive = 'F'
                         if c.name == "Hagen":
-                            self.player2_multiply_f = 1
+                            self.player2_multiply_f = 2
                         elif c.name == "Lee":
                             max = 0;
                             to_rem = []
@@ -204,8 +217,9 @@ class ConnectionManager:
                                 if i.power == max:
                                     to_rem.append(i)
                             for i in to_rem:
-                                self.player1_middleRow.remove(i)
-                                self.player1_stack.append(i)
+                                if "hero" not in i.effects:
+                                    self.player1_middleRow.remove(i)
+                                    self.player1_stack.append(i)
                         elif c.name == "Angar":
                             self.player2_choosing = True
                     if self.player1_choosing or self.player2_choosing :
@@ -230,6 +244,20 @@ class ConnectionManager:
                         self.player1_turn = 1
                         self.player2_turn = 0
                     client_socket.send(("OK\n").encode("utf-8"))
+                elif message[0] == "R":
+                    if counter == 1:
+                        x = int(message.split(";")[1])
+                        c = self.all_Cards[x]
+                        self.player1_cards.remove(c)
+                        if "hero" not in c.effects:
+                            self.player1_stack.append(c)
+                    elif counter == 2:
+                        x = int(message.split(";")[1])
+                        c = self.all_Cards[x]
+                        self.player2_cards.remove(c)
+                        if "hero" not in c.effects:
+                            self.player2_stack.append(c)
+                    client_socket.send(("Removed\n").encode("utf-8"))
                 elif message == "GetMyFrontRow\n":
                     if counter == 1:
                         s = self.get_cards_as_string(self.player1_frontRow)
@@ -322,6 +350,53 @@ class ConnectionManager:
                     if counter == 2:
                         s = self.player1_isHeroActive
                         client_socket.send((s + "\n").encode("utf-8"))
+                elif message == "GetMultiplies\n":
+                    if counter == 1:
+                        s = (str(self.player1_multiply_f) + ";" + str(self.player1_multiply_m) + ";" +
+                              str(self.player1_multiply_b) + ";")
+                        client_socket.send((s+"\n").encode("utf-8"))
+                    if counter == 2:
+                        s = (str(self.player2_multiply_f) + ";" + str(self.player2_multiply_m) + ";" +
+                             str(self.player2_multiply_b) + ";")
+                        client_socket.send((s + "\n").encode("utf-8"))
+                elif message == "GetOppMultiplies\n":
+                    if counter == 1:
+                        s = (str(self.player2_multiply_f) + ";" + str(self.player2_multiply_m) + ";" +
+                             str(self.player2_multiply_b) + ";")
+                        client_socket.send((s+"\n").encode("utf-8"))
+                    if counter == 2:
+                        s = (str(self.player1_multiply_f) + ";" + str(self.player1_multiply_m) + ";" +
+                             str(self.player1_multiply_b) + ";")
+                        client_socket.send((s + "\n").encode("utf-8"))
+                elif message == "GetStack\n":
+                    if counter == 1:
+                        s = self.get_cards_as_string(self.player1_stack)
+                        client_socket.send((s + "\n").encode("utf-8"))
+                    if counter == 2:
+                        s = self.get_cards_as_string(self.player2_stack)
+                        client_socket.send((s + "\n").encode("utf-8"))
+                elif message == "GetPassed\n":
+                    if counter == 1:
+                        if self.player1_pass:
+                            client_socket.send(("True\n").encode("utf-8"))
+                        else:
+                            client_socket.send(("False\n").encode("utf-8"))
+                    if counter == 2:
+                        if self.player2_pass:
+                            client_socket.send(("True\n").encode("utf-8"))
+                        else:
+                            client_socket.send(("False\n").encode("utf-8"))
+                elif message == "GetOppPassed\n":
+                    if counter == 2:
+                        if self.player1_pass:
+                            client_socket.send(("True\n").encode("utf-8"))
+                        else:
+                            client_socket.send(("False\n").encode("utf-8"))
+                    if counter == 1:
+                        if self.player2_pass:
+                            client_socket.send(("True\n").encode("utf-8"))
+                        else:
+                            client_socket.send(("False\n").encode("utf-8"))
                 elif message == "Pass\n":
                     if counter == 1:
                         self.player1_pass = True
@@ -335,9 +410,8 @@ class ConnectionManager:
                         client_socket.send("Got message\n".encode("utf-8"))
                 else:
                     client_socket.send("Wrong Message\n".encode("utf-8"))
-
         except Exception as e:
-            print("Server excp: " + str(e))
+            print("Server exception: " + str(e))
         finally:
             client_socket.close()
     def PrepareGame(self):
@@ -398,33 +472,75 @@ class ConnectionManager:
         s = ''
         if counter == 1:
             for card in self.player1_frontRow:
-                sum += card.power
-                line_sum += card.power
+                if "hero" in card.effects:
+                    sum += card.power
+                    line_sum += card.power
+                else:
+                    p = card.power
+                    if self.cold == 'T':
+                        p = 1
+                    sum += (p*self.player1_multiply_f) + self.player1_upgrade_f
+                    line_sum += (p*self.player1_multiply_f) + self.player1_upgrade_f
             s += str(line_sum) + ";"
             line_sum = 0
             for card in self.player1_middleRow:
-                sum += card.power
-                line_sum += card.power
+                if "hero" in card.effects:
+                    sum += card.power
+                    line_sum += card.power
+                else:
+                    p = card.power
+                    if self.fog == 'T':
+                        p = 1
+                    sum += (p*self.player1_multiply_m) + self.player1_upgrade_m
+                    line_sum += (p*self.player1_multiply_m) + self.player1_upgrade_m
             s += str(line_sum) + ";"
             line_sum = 0
             for card in self.player1_backRow:
-                sum += card.power
-                line_sum += card.power
+                if "hero" in card.effects:
+                    sum += card.power
+                    line_sum += card.power
+                else:
+                    p = card.power
+                    if self.rain == 'T':
+                        p = 1
+                    sum += (p*self.player1_multiply_b) + self.player1_upgrade_b
+                    line_sum += (p*self.player1_multiply_b) + self.player1_upgrade_b
             s += str(line_sum) + ";"
         if counter == 2:
             for card in self.player2_frontRow:
-                sum += card.power
-                line_sum += card.power
+                if "hero" in card.effects:
+                    sum += card.power
+                    line_sum += card.power
+                else:
+                    p = card.power
+                    if self.cold == 'T':
+                        p = 1
+                    sum += (p*self.player2_multiply_f) + self.player2_upgrade_f
+                    line_sum += (p*self.player2_multiply_f) + self.player2_upgrade_f
             s += str(line_sum) + ";"
             line_sum = 0
             for card in self.player2_middleRow:
-                sum += card.power
-                line_sum += card.power
+                if "hero" in card.effects:
+                    sum += card.power
+                    line_sum += card.power
+                else:
+                    p = card.power
+                    if self.fog == 'T':
+                        p = 1
+                    sum += (p*self.player2_multiply_m) + self.player2_upgrade_m
+                    line_sum += (p*self.player2_multiply_m) + self.player2_upgrade_m
             s += str(line_sum) + ";"
             line_sum = 0
             for card in self.player2_backRow:
-                sum += card.power
-                line_sum += card.power
+                if "hero" in card.effects:
+                    sum += card.power
+                    line_sum += card.power
+                else:
+                    p = card.power
+                    if self.rain == 'T':
+                        p = 1
+                    sum += (p*self.player2_multiply_f) + self.player2_upgrade_b
+                    line_sum += (p*self.player2_multiply_f) + self.player2_upgrade_b
             s += str(line_sum) + ";"
         if form == 'str':
             return s
@@ -444,7 +560,6 @@ class ConnectionManager:
                      self.player2_upgrade_b += 1
 
     def activateUpgrade(self,counter):
-
      pass
     def releaseUpgrade(self,counter):
      pass
@@ -556,11 +671,27 @@ class ConnectionManager:
             self.rain = 'F'
             self.fog = 'F'
             self.cold = 'F'
+    def realiseToAttack(self,counter,row):
+        if counter == 1:
+            if row == 'f':
+                self.player1_multiply_f = 2
+            if row == 'm':
+                self.player1_multiply_m = 2
+            if row == 'b':
+                self.player1_multiply_b = 2
+        if counter == 2:
+            if row == 'f':
+                self.player2_multiply_f = 2
+            if row == 'm':
+                self.player2_multiply_m = 2
+            if row == 'b':
+                self.player2_multiply_b = 2
 
 
     def endRound(self):
         sum1 = self.calculate_power(1)
         sum2 = self.calculate_power(2)
+
         if sum1 == sum2:
             self.player1_lifes -= 1
             self.player2_lifes -= 1
@@ -579,6 +710,8 @@ class ConnectionManager:
             self.player2_lifes -= 1
             self.player1_turn = 0
             self.player2_turn = 1
+
+        # czyszczenie pola
 
         for card in self.player1_frontRow:
             self.player1_stack.append(card)
@@ -603,3 +736,24 @@ class ConnectionManager:
         for card in self.player2_backRow:
             self.player2_stack.append(card)
         self.player2_backRow = []
+
+        # upgrades
+        self.player1_upgrade_f = 0
+        self.player2_upgrade_f = 0
+        self.player1_upgrade_m = 0
+        self.player2_upgrade_m = 0
+        self.player1_upgrade_b = 0
+        self.player2_upgrade_b = 0
+
+        # multiply
+        self.player1_multiply_f = 1
+        self.player2_multiply_f = 1
+        self.player1_multiply_m = 1
+        self.player2_multiply_m = 1
+        self.player1_multiply_b = 1
+        self.player2_multiply_b = 1
+
+        #weather
+        self.cold = 'F'
+        self.rain = 'F'
+        self.fog = 'F'

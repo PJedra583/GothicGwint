@@ -1,3 +1,2 @@
-list = ["heal","spy"]
-if "heal" in list:
-    print("OK")
+list = []
+print(len(list))

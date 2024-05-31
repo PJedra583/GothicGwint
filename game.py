@@ -50,6 +50,7 @@ class Game:
         self.messageClock = pygame.time.Clock()
         self.messageTimer = 0
         self.cardReverse = pygame.transform.scale(pygame.image.load("data/textures/rewers.jpg"),(CARD_SIZE_X,CARD_SIZE_Y))
+        self.cardToAttack = pygame.transform.scale(pygame.image.load("data/textures/In Extremo.jpg"),(CARD_SIZE_X,CARD_SIZE_Y))
         self.player_num = player
         self.stopHover = False
         self.rects_to_display = []
@@ -57,6 +58,8 @@ class Game:
         self.hero_card_to_display = None
         self.moved = False
 
+        self.passed = False
+        self.oppPassed = False
         #Pole bitwy
         self.MyFrontRow = []
         self.MyMiddleRow = []
@@ -74,6 +77,8 @@ class Game:
 
 
         self.weather = "FFF"
+        self.toAttack = None
+        self.oppToAttack = None
 
         #polaczenie z serwerem
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -114,23 +119,9 @@ class Game:
                  prepare_battlefield(self)
                 else:
                  prepare_battlefield(self)
-                 #because opp has moved
-                 self.moved = True
-            if self.choosing:
-                if len(self.cards_in_choose) == 0:
-                    send_mess(self, "E" + ";\n")
-                    self.choosing = False
-                    self.moved = True
-                    self.cards_in_choose = []
-                else:
-                    if self.pos_in_choose < 0:
-                        self.pos_in_choose = len(self.cards_in_choose) - 1
-                    if self.pos_in_choose == len(self.cards_in_choose):
-                        self.pos_in_choose = 0
-                    c = self.cards_in_choose[self.pos_in_choose]
-                    print("blitujemy" + str(self.pos_in_choose))
-                    self.screen.blit(c.image, c.image.get_rect(center=(self.screen.get_width() // 2,
-                                                                      self.screen.get_height() // 2)))
+                 #ponieważ nie wiemy czy oponent się ruszył
+                 if self.passed:
+                   self.moved = True
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     self.stopHover = False
@@ -161,7 +152,7 @@ class Game:
                                 pos = "m"
                             if cardType == "back":
                                 pos = "b"
-                            send_mess(self, "M;" + str(self.cards_in_choose[self.pos_in_choose].id) + pos + ";\n")
+                            send_mess(self, "M;" + str(self.cards_in_choose[self.pos_in_choose].id) + ";" + pos + ";\n")
                             self.choosing = False
                             self.cards_in_choose = []
                             self.moved = True
@@ -171,6 +162,22 @@ class Game:
                             self.turn = False
                             self.moved = True
             self.screen.blit(self.background_image, self.background_image.get_rect())
+
+            #Ekran wyboru
+            if self.choosing:
+                if len(self.cards_in_choose) == 0:
+                        send_mess(self, "E" + ";\n")
+                        self.choosing = False
+                        self.moved = True
+                        self.cards_in_choose = []
+                else:
+                    if self.pos_in_choose < 0:
+                        self.pos_in_choose = len(self.cards_in_choose) - 1
+                    if self.pos_in_choose >= len(self.cards_in_choose):
+                        self.pos_in_choose = 0
+                    c = self.cards_in_choose[self.pos_in_choose]
+                    self.screen.blit(c.image, c.image.get_rect(center=(self.screen.get_width() // 2,
+                                                                       self.screen.get_height() // 2)))
 
             #Linia statystyk, karta bohatera gora,pasek wyniku przeciwnik, pasek wyniku gracz
             #karta bohatera dol,kolo gora, kolo dol
@@ -261,9 +268,20 @@ class Game:
             pygame.draw.circle(self.screen, "white",
                                (screen_width * 0.2, screen_height // 4 + (screen_height * 0.1))
                                , 30)
+            if self.oppPassed :
+                text_surface = self.font.render("PAS!", True, "Red")
+                text_rect = text_surface.get_rect(
+                    center=(screen_width * 0.2, screen_height // 4 + (screen_height * 0.1) + 50))
+                self.screen.blit(text_surface, text_rect)
+
             pygame.draw.circle(self.screen, "white", (screen_width * 0.2, screen_height - (screen_height // 4) -
                                                       (screen_height * 0.1)), 30)
-
+            if self.passed :
+                text_surface = self.font.render("PAS!", True, "red")
+                text_rect = text_surface.get_rect(
+                    center=(screen_width * 0.2, screen_height - (screen_height // 4) -
+                                                      (screen_height * 0.1)-50))
+                self.screen.blit(text_surface, text_rect)
             text_surface = self.font.render(str(self.opp_score), True, "Black")
             text_rect = text_surface.get_rect(center=(screen_width * 0.2, screen_height // 4 + (screen_height * 0.1)))
             self.screen.blit(text_surface, text_rect)
@@ -362,6 +380,22 @@ class Game:
                 self.screen.blit(image, (screen_width * 0.36+(i*CARD_SIZE_X*0.9),
                                                     (space_for_line*1) + (space_for_line-CARD_SIZE_Y)))
 
+            #Rogi dowódcy
+            if int(self.toAttack[0]) > 1:
+                self.screen.blit(self.cardToAttack, ((screen_width * 0.26)+60,space_for_line*4,CARD_SIZE_X,CARD_SIZE_Y))
+            if int(self.toAttack[1]) > 1:
+                self.screen.blit(self.cardToAttack, ((screen_width * 0.26)+60,space_for_line*5,CARD_SIZE_X,CARD_SIZE_Y))
+            if int(self.toAttack[2]) > 1:
+                self.screen.blit(self.cardToAttack, ((screen_width * 0.26)+60,space_for_line*6,CARD_SIZE_X,CARD_SIZE_Y))
+
+            if int(self.oppToAttack[0]) > 1:
+                self.screen.blit(self.cardToAttack, ((screen_width * 0.26)+60,space_for_line*3,CARD_SIZE_X,CARD_SIZE_Y))
+            if int(self.oppToAttack[1]) > 1:
+                self.screen.blit(self.cardToAttack, ((screen_width * 0.26)+60,space_for_line*2,CARD_SIZE_X,CARD_SIZE_Y))
+            if int(self.oppToAttack[2]) > 1:
+                self.screen.blit(self.cardToAttack, ((screen_width * 0.26)+60,space_for_line*1,CARD_SIZE_X,CARD_SIZE_Y))
+
+
             #pogoda
             if self.weather[0] == 'T':
                 self.graphicEffects.draw_snow()
@@ -397,7 +431,6 @@ class Game:
                     self.messageClock = pygame.time.Clock()
                     if int(s) == 1:
                         self.turn = True
-                        #Because opponent has moved
                         self.moved = True
                 self.messageTimer += self.messageClock.tick(60) / 1000
             pygame.display.update()
@@ -498,6 +531,13 @@ def handle_click(self,screen):
                                               screen_width * 0.75, space_for_line))
                 self.rects_to_display.append((screen_width * 0.25, space_for_line * 5,
                                               screen_width * 0.75, space_for_line))
+            elif card.name == "In Extremo":
+                self.rects_to_display.append((screen_width * 0.25, space_for_line * 4,
+                                              screen_width * 0.75, space_for_line))
+                self.rects_to_display.append((screen_width * 0.25, space_for_line * 5,
+                                              screen_width * 0.75, space_for_line))
+                self.rects_to_display.append((screen_width * 0.25, space_for_line * 6,
+                                              screen_width * 0.75, space_for_line))
             elif card.type == "weather":
                 if card.name == "Mróz":
                     self.rects_to_display.append((screen_width * 0.25, space_for_line * 4,
@@ -525,18 +565,18 @@ def handle_click(self,screen):
             self.card_to_display = None
             self.stopHover = True
 
-
 def falling_text(self,screen):
-    if self.turn:
-        text_surface = self.font_comic.render("Twoj ruch", True, "Green")
-    else:
-        text_surface = self.font_comic.render("Ruch przeciwnika", True, "Red")
-    text_rect = text_surface.get_rect(center=(self.falling_text_x, screen.get_height()//2))
-    if self.falling_text_x >= screen.get_width()//2 and (0 <= self.timer <= 3):
-        self.timer += self.clock.tick(60) / 1000
-    else:
-        self.falling_text_x += 100
-    self.screen.blit(text_surface, text_rect)
+    if not self.passed:
+        if self.turn:
+            text_surface = self.font_comic.render("Twoj ruch", True, "Green")
+        else:
+            text_surface = self.font_comic.render("Ruch przeciwnika", True, "Red")
+        text_rect = text_surface.get_rect(center=(self.falling_text_x, screen.get_height()//2))
+        if self.falling_text_x >= screen.get_width()//2 and (0 <= self.timer <= 3):
+            self.timer += self.clock.tick(60) / 1000
+        else:
+            self.falling_text_x += 100
+        self.screen.blit(text_surface, text_rect)
 
 def checkIfMove(self):
     space_for_line = self.screen.get_height() // 8
@@ -551,9 +591,16 @@ def checkIfMove(self):
                 received_message = send_mess(self, "M;" + str(self.card_to_display) + ";" + "m" + ";\n")
             elif rect[1] == (space_for_line*6):
                 received_message = send_mess(self, "M;" + str(self.card_to_display) + ";" + "b" + ";\n")
-            if "heal" in self.all_Cards[self.card_to_display].effects:
-                print("Zagrano karte z leczeniem")
+            if received_message.strip() == "Waiting":
                 self.choosing = True
+                received_message = send_mess(self, "GetStack\n").strip()
+                #usunięcie karty
+                send_mess(self, "R;"+ str(self.card_to_display) +";\n")
+                self.cards_in_choose = []
+                self.pos_in_choose = 0
+                for id in received_message.split(";"):
+                    if id != '':
+                        self.cards_in_choose.append(self.all_Cards[int(id)])
             else:
                 self.moved = True
     if self.hero_card_to_display is not None and self.isHeroActive.strip() == "T":
@@ -612,8 +659,22 @@ def prepare_battlefield(self):
 
     self.weather = send_mess(self, "GetWeather\n")
 
+    self.toAttack = send_mess(self, "GetMultiplies\n").split(";")
+    self.oppToAttack = send_mess(self, "GetOppMultiplies\n").split(";")
+
     self.isHeroActive = send_mess(self, "GetIsHeroActive\n")
     self.isOppHeroActive = send_mess(self, "GetIsOppHeroActive\n")
+
+    mess = send_mess(self,"GetPassed\n")
+    if mess[0] == 'T':
+        self.passed = True
+    else:
+        self.passed = False
+    mess = send_mess(self,"GetOppPassed\n")
+    if mess[0] == 'T':
+        self.oppPassed = True
+    else:
+        self.oppPassed = False
 
     turn = send_mess(self, "GetMyTurn\n")
     if int(turn.strip()) == 0:
@@ -626,6 +687,7 @@ def prepare_battlefield(self):
     self.falling_text_x = 0
     self.timer = 0
     self.clock = pygame.time.Clock()
+    self.falling_text_x = 0
 
 
 def add_cards_to_List(self,mess,card_list):
