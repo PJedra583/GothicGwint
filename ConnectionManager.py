@@ -1,5 +1,4 @@
 import socket
-import threading
 import random
 from Card import Card
 from threading import Thread
@@ -26,7 +25,7 @@ class ConnectionManager:
         self.player1_hero = None
         self.player2_hero = None
         self.player1_lifes = 0
-        self.player2_lifes = 0
+        self.player2_lifes = 2
         self.player1_score = 0
         self.player2_score = 0
         self.player1_isHeroActive = "T"
@@ -544,6 +543,10 @@ class ConnectionManager:
                         p = 1
                     sum += (p*self.player2_multiply_f) + self.player2_upgrade_b
                     line_sum += (p*self.player2_multiply_f) + self.player2_upgrade_b
+                    if 'upgrade' in card.effects:
+                        #card doesnt apply upgrade to itself
+                        sum -= 1
+                        line_sum -= 1
             s += str(line_sum) + ";"
         if form == 'str':
             return s
@@ -571,6 +574,8 @@ class ConnectionManager:
         card = self.all_Cards[card_id]
         if counter == 1:
             for effect in card.effects:
+                if effect == "to_attack":
+                    self.player1_multiply_f = 2
                 if effect == "spy":
                     self.player1_cards.append(self.player1_card_Deck.pop(0))
                 if effect == "burn":
@@ -595,13 +600,13 @@ class ConnectionManager:
                         card_to_rem_b = []
 
                         for card in self.player2_frontRow:
-                            if card.power == max_power:
+                            if card.power == max_power and "hero" not in card.effects:
                                 card_to_rem_f.append(card)
                         for card in self.player2_middleRow:
-                            if card.power == max_power:
+                            if card.power == max_power and "hero" not in card.effects:
                                 card_to_rem_m.append(card)
                         for card in self.player2_backRow:
-                            if card.power == max_power:
+                            if card.power == max_power and "hero" not in card.effects:
                                 card_to_rem_b.append(card)
 
                         for card in card_to_rem_f:
@@ -617,6 +622,8 @@ class ConnectionManager:
                     self.player1_choosing = True
         if counter == 2:
             for effect in card.effects:
+                if effect == "to_attack":
+                    self.player2_multiply_f = 2
                 if effect == "spy":
                     self.player2_cards.append(self.player2_card_Deck.pop(0))
                 if effect == "burn":
@@ -641,13 +648,13 @@ class ConnectionManager:
                         card_to_rem_b = []
 
                         for card in self.player1_frontRow:
-                            if card.power == max_power:
+                            if card.power == max_power and "hero" not in card.effects:
                                 card_to_rem_f.append(card)
                         for card in self.player1_middleRow:
-                            if card.power == max_power:
+                            if card.power == max_power and "hero" not in card.effects:
                                 card_to_rem_m.append(card)
                         for card in self.player1_backRow:
-                            if card.power == max_power:
+                            if card.power == max_power and "hero" not in card.effects:
                                 card_to_rem_b.append(card)
 
                         for card in card_to_rem_f:

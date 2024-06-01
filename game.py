@@ -1,10 +1,6 @@
 import os
-import threading
-
 import pygame
 import socket
-
-import ConnectionManager
 
 from GraphicEffects import GraphicEffects
 from Cursor import Cursor
@@ -733,17 +729,3 @@ def send_mess(self,mess):
 
     except Exception as e:
         return ""
-
-if __name__ == "__main__":
-
-    connectionManager = ConnectionManager.ConnectionManager('192.168.1.26',8091)
-    threading.Thread(target=connectionManager.start_server).start()
-    pygame.init()
-    screen_info = pygame.display.Info()
-    SCREEN_WIDTH = screen_info.current_w
-    SCREEN_HEIGHT = screen_info.current_h
-    window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    main_instance = Game(window,'192.168.1.26' ,1)
-    main_instance.run()
-
-

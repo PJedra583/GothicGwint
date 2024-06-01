@@ -1,5 +1,4 @@
 import pygame
-import os
 import random
 class Card:
     cards = []
@@ -75,7 +74,7 @@ class Card:
         self.cards.append(Card("Lares", 4, mid, (spy,)))
         self.heroses.append(Card("Lee", None, h, ("Niszczy najsilniejsze łucznictwo wroga",)))
         self.cards.append(Card("Lester", 8, b, (h,heal)))
-        self.cards.append(Card("Manekin", None, t, (t,)))
+        #self.cards.append(Card("Manekin", None, t, (t,)))
         self.cards.append(Card("Mgła", 0, w, ("Zmniejsz siłe po środku",)))
         self.cards.append(Card("Milten", 10, mid, (h,)))
         self.cards.append(Card("Mróz", 0, w, ("Zmniejsz siłe z przodu",)))
@@ -84,7 +83,7 @@ class Card:
         self.cards.append(Card("Niebo", 0, w, ("Usun efekty pogodowe",)))
         self.cards.append(Card("Onar", 2, mid, (summon,)))
         self.cards.append(Card("Opętany", 2, f, (summon,)))
-        self.cards.append(Card("Pożoga", None, pos_to_burn, (burn,)))
+        #self.cards.append(Card("Pożoga", None, pos_to_burn, (burn,)))
         self.cards.append(Card("Pyrokar", 8, mid, (h,)))
         self.cards.append(Card("Rączka", 3, mid, (spy,)))
         self.heroses.append(Card("Rhobar", None, h, ("Weź o jedną karte więcej")))

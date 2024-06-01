@@ -69,7 +69,7 @@ class GraphicEffects:
             x = random.randint(x_min, x_max)
             y = random.randint(y_min, y_max)
             size = random.randint(20, 50)
-            opacity = random.randint(30, 70)  # Różna przezroczystość cząsteczek mgły
+            opacity = random.randint(30, 70)
             self.fog_particles.append([x, y, size, opacity])
 
 

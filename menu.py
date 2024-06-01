@@ -42,7 +42,7 @@ class Menu:
         return -1
 
     def handle_hover(self):
-        #lock do zarządzania czy kursor ruszył się z pola tekstowego
+        #self.lock do zarządzania czy kursor ruszył się z pola tekstowego
         #opcjonalnie jeżeli i != poprzednie i to zastopowac dzwiek i zagrac ponownie
         was_cursor_on_text = False
         for i in range(len(self.rects)):
