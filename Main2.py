@@ -2,6 +2,7 @@ import pygame
 import menu
 
 from Makers import Makers
+from Guide import Guide
 from PlayerScreen1 import PlayerScreen
 from PlayerScreen2 import PlayerScreen2
 
@@ -12,7 +13,7 @@ class Main:
 
         # Ustawienia menu
         pygame.mouse.set_visible(False)
-        pygame.mixer.music.load("data/music/Gothic 1 Soundtrack  Swamp Camp  Ambient + Music.mp3")
+        pygame.mixer.music.load("data/music/muzyczkadogry2.mp3")
         screen_info = pygame.display.Info()
         self.SCREEN_WIDTH = screen_info.current_w
         self.SCREEN_HEIGHT = screen_info.current_h
@@ -24,7 +25,7 @@ class Main:
         pygame.display.set_caption("Gothic Gwint")
 
     def run(self):
-#        pygame.mixer.music.play()
+        pygame.mixer.music.play()
         menu_running = True
         while menu_running:
             for event in pygame.event.get():
@@ -37,7 +38,7 @@ class Main:
                         elif button_number == 1:
                             PlayerScreen(self.window)
                         elif button_number == 2:
-                            print()
+                            Guide(self.window)
                         elif button_number == 3:
                             Makers(self.window)
                         elif button_number == 4:

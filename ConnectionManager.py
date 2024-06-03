@@ -24,7 +24,7 @@ class ConnectionManager:
         self.player2_stack = []
         self.player1_hero = None
         self.player2_hero = None
-        self.player1_lifes = 0
+        self.player1_lifes = 2
         self.player2_lifes = 2
         self.player1_score = 0
         self.player2_score = 0
@@ -138,7 +138,6 @@ class ConnectionManager:
                     c = self.all_Cards[card_id]
                     if counter == 1:
                         self.checkAndRealiseEffects(1, card_id, row)
-                        self.checkUpgrade(1)
                         if not self.player1_choosing:
                             self.player1_cards.remove(c)
                         if c.type == "weather":
@@ -146,14 +145,22 @@ class ConnectionManager:
                         if c.name == "In Extremo":
                             self.realiseToAttack(counter,row)
                         elif row == "f":
-                            self.player1_frontRow.append(c)
+                            if "spy" in c.effects:
+                                self.player2_frontRow.append(c)
+                            else:
+                                self.player1_frontRow.append(c)
                         elif row == "m":
-                            self.player1_middleRow.append(c)
+                            if "spy" in c.effects:
+                                self.player2_middleRow.append(c)
+                            else:
+                                self.player1_middleRow.append(c)
                         elif row == "b":
-                            self.player1_backRow.append(c)
+                            if "spy" in c.effects:
+                                self.player2_backRow.append(c)
+                            else:
+                                self.player1_backRow.append(c)
                     if counter == 2:
                         self.checkAndRealiseEffects(2, card_id, row)
-                        self.checkUpgrade(2)
                         if not self.player2_choosing:
                             self.player2_cards.remove(c)
                         if c.type == "weather":
@@ -161,11 +168,20 @@ class ConnectionManager:
                         if c.name == "In Extremo":
                             self.realiseToAttack(counter,row)
                         elif row == "f":
-                            self.player2_frontRow.append(c)
+                            if "spy" in c.effects:
+                                self.player1_frontRow.append(c)
+                            else:
+                                self.player2_frontRow.append(c)
                         elif row == "m":
-                            self.player2_middleRow.append(c)
+                            if "spy" in c.effects:
+                                self.player1_middleRow.append(c)
+                            else:
+                                self.player2_middleRow.append(c)
                         elif row == "b":
-                            self.player2_backRow.append(c)
+                            if "spy" in c.effects:
+                                self.player1_backRow.append(c)
+                            else:
+                                self.player2_backRow.append(c)
                     if "heal" in c.effects:
                         client_socket.send(("Waiting\n").encode("utf-8"))
                     elif self.player1_choosing:
@@ -472,6 +488,7 @@ class ConnectionManager:
         sum = 0
         line_sum = 0
         s = ''
+        self.activateUpgrade()
         if counter == 1:
             for card in self.player1_frontRow:
                 if "hero" in card.effects:
@@ -483,6 +500,10 @@ class ConnectionManager:
                         p = 1
                     sum += (p*self.player1_multiply_f) + self.player1_upgrade_f
                     line_sum += (p*self.player1_multiply_f) + self.player1_upgrade_f
+                    #because card cant upgrade itself
+                    if "upgrade" in card.effects:
+                        sum -= 1
+                        line_sum -= 1
             s += str(line_sum) + ";"
             line_sum = 0
             for card in self.player1_middleRow:
@@ -495,6 +516,9 @@ class ConnectionManager:
                         p = 1
                     sum += (p*self.player1_multiply_m) + self.player1_upgrade_m
                     line_sum += (p*self.player1_multiply_m) + self.player1_upgrade_m
+                    if "upgrade" in card.effects:
+                        sum -= 1
+                        line_sum -= 1
             s += str(line_sum) + ";"
             line_sum = 0
             for card in self.player1_backRow:
@@ -507,6 +531,9 @@ class ConnectionManager:
                         p = 1
                     sum += (p*self.player1_multiply_b) + self.player1_upgrade_b
                     line_sum += (p*self.player1_multiply_b) + self.player1_upgrade_b
+                    if "upgrade" in card.effects:
+                        sum -= 1
+                        line_sum -= 1
             s += str(line_sum) + ";"
         if counter == 2:
             for card in self.player2_frontRow:
@@ -519,6 +546,9 @@ class ConnectionManager:
                         p = 1
                     sum += (p*self.player2_multiply_f) + self.player2_upgrade_f
                     line_sum += (p*self.player2_multiply_f) + self.player2_upgrade_f
+                    if "upgrade" in card.effects:
+                        sum -= 1
+                        line_sum -= 1
             s += str(line_sum) + ";"
             line_sum = 0
             for card in self.player2_middleRow:
@@ -531,6 +561,9 @@ class ConnectionManager:
                         p = 1
                     sum += (p*self.player2_multiply_m) + self.player2_upgrade_m
                     line_sum += (p*self.player2_multiply_m) + self.player2_upgrade_m
+                    if "upgrade" in card.effects:
+                        sum -= 1
+                        line_sum -= 1
             s += str(line_sum) + ";"
             line_sum = 0
             for card in self.player2_backRow:
@@ -543,8 +576,7 @@ class ConnectionManager:
                         p = 1
                     sum += (p*self.player2_multiply_f) + self.player2_upgrade_b
                     line_sum += (p*self.player2_multiply_f) + self.player2_upgrade_b
-                    if 'upgrade' in card.effects:
-                        #card doesnt apply upgrade to itself
+                    if "upgrade" in card.effects:
                         sum -= 1
                         line_sum -= 1
             s += str(line_sum) + ";"
@@ -552,24 +584,31 @@ class ConnectionManager:
             return s
         return sum
 
-
-    def checkUpgrade(self,counter):
-        if counter == 1:
-         for card in self.player1_backRow:
-             for effect in card.effects:
-                if effect == 'upgrade':
-                     self.player1_upgrade_b += 1
-        if counter == 2:
-         for card in self.player2_backRow:
-             for effect in card.effects:
-                if effect == 'upgrade':
-                     self.player2_upgrade_b += 1
-
-    def activateUpgrade(self,counter):
-     pass
-    def releaseUpgrade(self,counter):
-     pass
-
+    def activateUpgrade(self):
+     self.player1_upgrade_b = 0
+     self.player2_upgrade_b = 0
+     self.player1_upgrade_m = 0
+     self.player2_upgrade_m = 0
+     self.player1_upgrade_f = 0
+     self.player2_upgrade_f = 0
+     for card in self.player1_frontRow:
+        if "upgrade" in card.effects:
+            self.player1_upgrade_f += 1
+     for card in self.player1_middleRow:
+         if "upgrade" in card.effects:
+             self.player1_upgrade_m += 1
+     for card in self.player1_backRow:
+         if "upgrade" in card.effects:
+             self.player1_upgrade_b += 1
+     for card in self.player2_frontRow:
+         if "upgrade" in card.effects:
+             self.player2_upgrade_f += 1
+     for card in self.player2_middleRow:
+         if "upgrade" in card.effects:
+             self.player2_upgrade_m += 1
+     for card in self.player2_backRow:
+         if "upgrade" in card.effects:
+             self.player2_upgrade_b += 1
     def checkAndRealiseEffects(self,counter,card_id,pos):
         card = self.all_Cards[card_id]
         if counter == 1:
@@ -581,34 +620,78 @@ class ConnectionManager:
                 if effect == "burn":
                     sum = 0
                     for card in self.player2_frontRow:
-                        sum += card.power
-
+                        if "hero" not in card.effects:
+                            p = card.power
+                            if self.cold == 'T':
+                                p = 1
+                            if "upgrade" in card.effects:
+                                p -= 1
+                            sum += (p*self.player2_multiply_f)+self.player2_upgrade_f
                     max_power = 0
                     for card in self.player2_frontRow:
-                        if card.power >= max_power:
-                            max_power = card.power
+                        p = card.power
+                        if "hero" not in card.effects:
+                            if self.cold == 'T':
+                                p = 1
+                            p = (p*self.player2_multiply_f)+self.player2_upgrade_f
+                            if "upgrade" in card.effects:
+                                p -= 1
+                        if p >= max_power:
+                            max_power = p
                     for card in self.player2_middleRow:
+                        p = card.power
+                        if "hero" not in card.effects:
+                            if self.fog == 'T':
+                                p = 1
+                            p = (p * self.player2_multiply_m) + self.player2_upgrade_m
+                            if "upgrade" in card.effects:
+                                p -= 1
                         if card.power >= max_power:
                             max_power = card.power
                     for card in self.player2_backRow:
+                        p = card.power
+                        if "hero" not in card.effects:
+                            if self.rain == 'T':
+                                p = 1
+                            p = (p * self.player2_multiply_b) + self.player2_upgrade_b
+                            if "upgrade" in card.effects:
+                                p -= 1
                         if card.power >= max_power:
                             max_power = card.power
-
                     if sum >= 10:
                         card_to_rem_f = []
                         card_to_rem_m = []
                         card_to_rem_b = []
-
                         for card in self.player2_frontRow:
-                            if card.power == max_power and "hero" not in card.effects:
-                                card_to_rem_f.append(card)
+                            if "hero" not in card.effects:
+                                p = card.power
+                                if self.cold == 'T':
+                                    p = 1
+                                p = (p * self.player2_multiply_f) + self.player2_upgrade_f
+                                if "upgrade" in card.effects:
+                                    p -= 1
+                                if p == max_power:
+                                    card_to_rem_f.append(card)
                         for card in self.player2_middleRow:
-                            if card.power == max_power and "hero" not in card.effects:
-                                card_to_rem_m.append(card)
+                            if "hero" not in card.effects:
+                                p = card.power
+                                if self.fog == 'T':
+                                    p = 1
+                                p = (p * self.player2_multiply_m) + self.player2_upgrade_m
+                                if "upgrade" in card.effects:
+                                    p -= 1
+                                if p == max_power:
+                                    card_to_rem_m.append(card)
                         for card in self.player2_backRow:
-                            if card.power == max_power and "hero" not in card.effects:
-                                card_to_rem_b.append(card)
-
+                            if "hero" not in card.effects:
+                                p = card.power
+                                if self.rain == 'T':
+                                    p = 1
+                                p = (p * self.player2_multiply_b) + self.player2_upgrade_b
+                                if "upgrade" in card.effects:
+                                    p -= 1
+                                if p == max_power:
+                                    card_to_rem_b.append(card)
                         for card in card_to_rem_f:
                             self.player2_stack.append(card)
                             self.player2_frontRow.remove(card)
@@ -629,34 +712,78 @@ class ConnectionManager:
                 if effect == "burn":
                     sum = 0
                     for card in self.player1_frontRow:
-                        sum += card.power
-
+                        if "hero" not in card.effects:
+                            p = card.power
+                            if self.cold == 'T':
+                                p = 1
+                            if "upgrade" in card.effects:
+                                p -= 1
+                            sum += (p * self.player1_multiply_f) + self.player1_upgrade_f
                     max_power = 0
                     for card in self.player1_frontRow:
-                        if card.power >= max_power:
-                            max_power = card.power
+                        p = card.power
+                        if "hero" not in card.effects:
+                            if self.cold == 'T':
+                                p = 1
+                            p = (p * self.player1_multiply_f) + self.player1_upgrade_f
+                            if "upgrade" in card.effects:
+                                p -= 1
+                        if p >= max_power:
+                            max_power = p
                     for card in self.player1_middleRow:
+                        p = card.power
+                        if "hero" not in card.effects:
+                            if self.fog == 'T':
+                                p = 1
+                            p = (p * self.player1_multiply_m) + self.player1_upgrade_m
+                            if "upgrade" in card.effects:
+                                p -= 1
                         if card.power >= max_power:
                             max_power = card.power
                     for card in self.player1_backRow:
+                        p = card.power
+                        if "hero" not in card.effects:
+                            if self.rain == 'T':
+                                p = 1
+                            p = (p * self.player1_multiply_b) + self.player1_upgrade_b
+                            if "upgrade" in card.effects:
+                                p -= 1
                         if card.power >= max_power:
                             max_power = card.power
-
                     if sum >= 10:
                         card_to_rem_f = []
                         card_to_rem_m = []
                         card_to_rem_b = []
-
                         for card in self.player1_frontRow:
-                            if card.power == max_power and "hero" not in card.effects:
-                                card_to_rem_f.append(card)
+                            if "hero" not in card.effects:
+                                p = card.power
+                                if self.cold == 'T':
+                                    p = 1
+                                p = (p * self.player1_multiply_f) + self.player1_upgrade_f
+                                if "upgrade" in card.effects:
+                                    p -= 1
+                                if p == max_power:
+                                    card_to_rem_f.append(card)
                         for card in self.player1_middleRow:
-                            if card.power == max_power and "hero" not in card.effects:
-                                card_to_rem_m.append(card)
+                            if "hero" not in card.effects:
+                                p = card.power
+                                if self.fog == 'T':
+                                    p = 1
+                                p = (p * self.player1_multiply_m) + self.player1_upgrade_m
+                                if "upgrade" in card.effects:
+                                    p -= 1
+                                if p == max_power:
+                                    card_to_rem_m.append(card)
                         for card in self.player1_backRow:
-                            if card.power == max_power and "hero" not in card.effects:
-                                card_to_rem_b.append(card)
-
+                            if "hero" not in card.effects:
+                                p = card.power
+                                if self.rain == 'T':
+                                    p = 1
+                                p = (p * self.player1_multiply_b) + self.player1_upgrade_b
+                                if "upgrade" in card.effects:
+                                    p -= 1
+                                if p == max_power:
+                                    card_to_rem_b.append(card)
                         for card in card_to_rem_f:
                             self.player1_stack.append(card)
                             self.player1_frontRow.remove(card)

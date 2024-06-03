@@ -156,6 +156,7 @@ class Game:
                             mess = send_mess(self, "M;" + str(self.cards_in_choose[self.pos_in_choose].id) + ";" + pos + ";\n")
                             if mess.strip() == "Waiting":
                                 send_mess(self, "E" + ";\n")
+                            print("I was here 2")
                             self.choosing = False
                             self.cards_in_choose = []
                             self.moved = True
@@ -394,21 +395,21 @@ class Game:
                 self.graphicEffects.draw_rain()
                 self.graphicEffectsOpp.draw_rain()
 
-                # Ekran wyboru
-                if self.choosing:
-                    if len(self.cards_in_choose) == 0:
-                        send_mess(self, "E" + ";\n")
-                        self.choosing = False
-                        self.moved = True
-                        self.cards_in_choose = []
-                    else:
-                        if self.pos_in_choose < 0:
-                            self.pos_in_choose = len(self.cards_in_choose) - 1
-                        if self.pos_in_choose >= len(self.cards_in_choose):
-                            self.pos_in_choose = 0
-                        c = self.cards_in_choose[self.pos_in_choose]
-                        self.screen.blit(c.image, c.image.get_rect(center=(self.screen.get_width() // 2,
-                                                                           self.screen.get_height() // 2)))
+            # Ekran wyboru
+            if self.choosing:
+                if len(self.cards_in_choose) == 0:
+                    send_mess(self, "E" + ";\n")
+                    self.choosing = False
+                    self.moved = True
+                    self.cards_in_choose = []
+                else:
+                    if self.pos_in_choose < 0:
+                        self.pos_in_choose = len(self.cards_in_choose) - 1
+                    if self.pos_in_choose >= len(self.cards_in_choose):
+                        self.pos_in_choose = 0
+                    c = self.cards_in_choose[self.pos_in_choose]
+                    self.screen.blit(c.image, c.image.get_rect(center=(self.screen.get_width() // 2,
+                                                                       self.screen.get_height() // 2)))
 
             #wybor pola
             if not self.stopHover :
@@ -604,8 +605,7 @@ def checkIfMove(self):
             if received_message.strip() == "Waiting":
                 self.choosing = True
                 received_message = send_mess(self, "GetStack\n").strip()
-                #usunięcie karty
-                send_mess(self, "R;"+ str(self.card_to_display) +";\n")
+                send_mess(self,"R;"+str(self.card_to_display)+";")
                 self.cards_in_choose = []
                 self.pos_in_choose = 0
                 for id in received_message.split(";"):
@@ -624,6 +624,9 @@ def checkIfMove(self):
             self.moved = True
 
 def prepare_battlefield(self):
+    print("<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>")
+    print("Preparing battlefield")
+    print("<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>")
     self.my_cards = []
     s = send_mess(self,"GetMyCards\n")
     add_cards_to_List(self,s,self.my_cards)

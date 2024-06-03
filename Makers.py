@@ -18,7 +18,7 @@ class Makers:
         self.makers_items = \
             ["Oprogramowanie: Piotr Jędra","Udźwiękowienie: Franciszek Kalinowski","Karty do gry: Quash"]
         self.makers_names = pygame.font.Font(font_path_comic, 40)
-        self.makers_y = -300 # Początkowa pozycja dla pierwszego tekstu
+        self.makers_y = -300
         game_makers_screen = True
         while game_makers_screen:
             screen.fill((19, 19, 19))
