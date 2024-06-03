@@ -2,15 +2,22 @@ import pygame
 import os
 from Cursor import Cursor
 
+
 class Menu:
 
-    def __init__(self,screen):
-        font_path = os.path.join("data", "fonts", "Gothic_Ingame_Offiziell.ttf")  # Font z gothica
+    def __init__(self, screen):
+        font_path = os.path.join(
+            "data", "fonts", "Gothic_Ingame_Offiziell.ttf")  # Font z gothica
         self.font = pygame.font.Font(font_path, 70)
         self.color = (255, 255, 255)
-        self.items = ["Stworz gre","Dolacz do gry", "Samouczek", "Tworcy gry", "Exit"]
-        self.background_image = pygame.transform.scale( pygame.image.load("data/Background4.jpg"),
-                                                        (screen.get_width(), screen.get_height()) )
+        self.items = [
+            "Stworz gre",
+            "Dolacz do gry",
+            "Samouczek",
+            "Tworcy gry",
+            "Exit"]
+        self.background_image = pygame.transform.scale(pygame.image.load(
+            "data/Background4.jpg"), (screen.get_width(), screen.get_height()))
         self.background_rect = self.background_image.get_rect()
         self.rects = []
         self.texts = []
@@ -25,6 +32,7 @@ class Menu:
             self.texts.append(text)
             self.rects.append(text_rect)
             y += 80
+
     def draw(self, screen):
 
         screen.blit(self.background_image, self.background_rect)
@@ -33,33 +41,29 @@ class Menu:
         self.cursor.update()
         self.cursor.draw(screen)
 
-
-
     def handle_click(self):
         for i in range(len(self.rects)):
             if self.rects[i].collidepoint(pygame.mouse.get_pos()):
-             return i
+                return i
         return -1
 
     def handle_hover(self):
-        #self.lock do zarządzania czy kursor ruszył się z pola tekstowego
-        #opcjonalnie jeżeli i != poprzednie i to zastopowac dzwiek i zagrac ponownie
+        # self.lock do zarządzania czy kursor ruszył się z pola tekstowego
+        # opcjonalnie jeżeli i != poprzednie i to zastopowac dzwiek i zagrac
+        # ponownie
         was_cursor_on_text = False
         for i in range(len(self.rects)):
             if self.rects[i].collidepoint(pygame.mouse.get_pos()):
                 self.texts[i] = self.font.render(self.items[i], True, "green")
-                if not self.lock :
-                 self.hover_sound.play()
-                 self.lock = True
+                if not self.lock:
+                    self.hover_sound.play()
+                    self.lock = True
                 was_cursor_on_text = True
             else:
-                self.texts[i] = self.font.render(self.items[i], True, self.color)
-        if was_cursor_on_text :
+                self.texts[i] = self.font.render(
+                    self.items[i], True, self.color)
+        if was_cursor_on_text:
             self.cursor.changeType(1)
         else:
             self.cursor.changeType(2)
             self.lock = False
-
-
-
-

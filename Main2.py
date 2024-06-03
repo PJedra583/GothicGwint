@@ -6,6 +6,7 @@ from Guide import Guide
 from PlayerScreen1 import PlayerScreen
 from PlayerScreen2 import PlayerScreen2
 
+
 class Main:
 
     def __init__(self):
@@ -17,22 +18,21 @@ class Main:
         screen_info = pygame.display.Info()
         self.SCREEN_WIDTH = screen_info.current_w
         self.SCREEN_HEIGHT = screen_info.current_h
-        self.window = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+        self.window = pygame.display.set_mode(
+            (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
 
         self.main_menu = menu.Menu(self.window)
-
-        # Ustawienie rozmiaru okna
         pygame.display.set_caption("Gothic Gwint")
 
     def run(self):
-        pygame.mixer.music.play()
+        # pygame.mixer.music.play()
         menu_running = True
         while menu_running:
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:  # LMB
                         button_number = self.main_menu.handle_click()
-                        #Stworz,Dolacz,Samouczek,tworcy,exit
+                        # Stworz,Dolacz,Samouczek,tworcy,exit
                         if button_number == 0:
                             PlayerScreen2(self.window)
                         elif button_number == 1:
@@ -48,6 +48,7 @@ class Main:
             pygame.display.update()
 
         pygame.quit()
+
 
 if __name__ == "__main__":
     main_instance = Main()

@@ -4,16 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8957ae46-d718-4aab-845a-00d2a392878f" name="Changes" comment="--Goodnight commit 31.05">
-      <change afterPath="$PROJECT_DIR$/GothicGwint.zip" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Guide.py" afterDir="false" />
+    <list default="true" id="8957ae46-d718-4aab-845a-00d2a392878f" name="Changes" comment="--commit 04.06">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Card.py" beforeDir="false" afterPath="$PROJECT_DIR$/Card.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client.py" beforeDir="false" afterPath="$PROJECT_DIR$/Client.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ConnectionManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/ConnectionManager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cursor.py" beforeDir="false" afterPath="$PROJECT_DIR$/Cursor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GraphicEffects.py" beforeDir="false" afterPath="$PROJECT_DIR$/GraphicEffects.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Guide.py" beforeDir="false" afterPath="$PROJECT_DIR$/Guide.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Main2.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main2.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Makers.py" beforeDir="false" afterPath="$PROJECT_DIR$/Makers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/music/Gothic 1 Soundtrack  Swamp Camp  Ambient + Music.mp3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/PlayerScreen1.py" beforeDir="false" afterPath="$PROJECT_DIR$/PlayerScreen1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PlayerScreen2.py" beforeDir="false" afterPath="$PROJECT_DIR$/PlayerScreen2.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/menu.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -262,7 +267,7 @@
       <workItem from="1717000670222" duration="1112000" />
       <workItem from="1717139070269" duration="41075000" />
       <workItem from="1717244431945" duration="4258000" />
-      <workItem from="1717437975392" duration="11517000" />
+      <workItem from="1717437975392" duration="12496000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -488,7 +493,23 @@
       <option name="project" value="LOCAL" />
       <updated>1717248345242</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="--commit 04.06">
+      <option name="closed" value="true" />
+      <created>1717452561508</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1717452561508</updated>
+    </task>
+    <task id="LOCAL-00030" summary="--commit 04.06">
+      <option name="closed" value="true" />
+      <created>1717452595592</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1717452595592</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -508,7 +529,8 @@
     <MESSAGE value="--Work in progres 25.05" />
     <MESSAGE value="--Work in progres 31.05" />
     <MESSAGE value="--Goodnight commit 31.05" />
-    <option name="LAST_COMMIT_MESSAGE" value="--Goodnight commit 31.05" />
+    <MESSAGE value="--commit 04.06" />
+    <option name="LAST_COMMIT_MESSAGE" value="--commit 04.06" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/GothicGwint$PlayerScreen1.coverage" NAME="PlayerScreen1 Coverage Results" MODIFIED="1717191094584" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -520,7 +542,7 @@
     <SUITE FILE_PATH="coverage/GothicGwint$Game2.coverage" NAME="Game2 Coverage Results" MODIFIED="1714650924549" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GothicGwint$Server2.coverage" NAME="Server2 Coverage Results" MODIFIED="1714172381523" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GothicGwint$Client2.coverage" NAME="Client2 Coverage Results" MODIFIED="1714172395438" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GothicGwint$Main.coverage" NAME="Main Coverage Results" MODIFIED="1717451905201" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GothicGwint$Main.coverage" NAME="Main Coverage Results" MODIFIED="1717452466397" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GothicGwint$Client.coverage" NAME="Client Coverage Results" MODIFIED="1714385416405" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GothicGwint$game__1_.coverage" NAME="game (1) Coverage Results" MODIFIED="1714594834199" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GothicGwint$Test.coverage" NAME="Test Coverage Results" MODIFIED="1716651915124" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

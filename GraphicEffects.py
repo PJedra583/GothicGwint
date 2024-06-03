@@ -12,7 +12,6 @@ class GraphicEffects:
         self.rain_drops = []
         self.fog_particles = []
 
-
     def make_rain(self, area, rain_drop_count=100):
         x_min, y_min, x_max, y_max = area
         self.rainArea = area
@@ -28,14 +27,15 @@ class GraphicEffects:
 
         for drop in self.rain_drops:
             drop[1] += drop[2]
-            #kropla spada gdzie indziej
+            # kropla spada gdzie indziej
             if drop[1] > self.screen_height:
                 drop[1] = 0
                 drop[0] = random.randint(x_min, x_max)
                 drop[2] = random.randint(4, 16)
         for drop in self.rain_drops:
             if y_min <= drop[1] <= y_max:
-                pygame.draw.line(self.screen, self.rain_color, (drop[0], drop[1]), (drop[0], drop[1] + 10), 2)
+                pygame.draw.line(self.screen, self.rain_color,
+                                 (drop[0], drop[1]), (drop[0], drop[1] + 10), 2)
 
     def make_snow(self, area, snow_flake_count=1000):
         x_min, y_min, x_max, y_max = area
@@ -47,6 +47,7 @@ class GraphicEffects:
             speed = random.uniform(1, 4)
             size = random.randint(2, 5)
             self.snow_flakes.append([x, y, speed, size])
+
     def draw_snow(self):
         x_min, y_min, x_max, y_max = self.snowArea
 
@@ -59,8 +60,10 @@ class GraphicEffects:
                 flake[3] = random.randint(2, 5)
 
         for flake in self.snow_flakes:
-            if y_min+flake[3] <= flake[1] <= y_max-flake[3]:
-                pygame.draw.circle(self.screen, self.snow_color, (flake[0], flake[1]), flake[3])
+            if y_min + flake[3] <= flake[1] <= y_max - flake[3]:
+                pygame.draw.circle(
+                    self.screen, self.snow_color, (flake[0], flake[1]), flake[3])
+
     def make_fog(self, area, fog_particle_count=100):
         x_min, y_min, x_max, y_max = area
         self.fogArea = area
@@ -71,7 +74,6 @@ class GraphicEffects:
             size = random.randint(20, 50)
             opacity = random.randint(30, 70)
             self.fog_particles.append([x, y, size, opacity])
-
 
     def draw_fog(self):
         x_min, y_min, x_max, y_max = self.fogArea
@@ -89,9 +91,22 @@ class GraphicEffects:
             if particle[0] > x_max:
                 particle[0] = x_max
 
-            surface = pygame.Surface((particle[2], particle[2]), pygame.SRCALPHA)
+            surface = pygame.Surface(
+                (particle[2], particle[2]), pygame.SRCALPHA)
             fog_color = (200, 200, 200, particle[3])
             # w połowie surface rysuje koło o promieniu połowy rozmiaru
-            pygame.draw.circle(surface, fog_color, (particle[2] // 2, particle[2] // 2), particle[2] // 2)
+            pygame.draw.circle(
+                surface,
+                fog_color,
+                (particle[2] // 2,
+                 particle[2] // 2),
+                particle[2] // 2)
             # rysowanie względem ekranu
-            self.screen.blit(surface, (particle[0] - particle[2] // 2, particle[1] - particle[2] // 2))
+            self.screen.blit(
+                surface,
+                (particle[0] -
+                 particle[2] //
+                    2,
+                    particle[1] -
+                    particle[2] //
+                    2))
