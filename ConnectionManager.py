@@ -157,7 +157,22 @@ class ConnectionManager:
                             self.player1_cards.remove(c)
                         if c.type == "weather":
                             self.realiseWeather(c)
-                        if c.name == "In Extremo":
+                        elif c.type == "pos_to_burn":
+                            print("Użyto pożogi")
+                        elif c.type == "trap":
+                            card_to_replace = self.all_Cards[int(message.split(";")[4])]
+                            if row == 'f':
+                                self.player1_frontRow.remove(card_to_replace)
+                                self.player1_frontRow.append(c)
+                            elif row == 'm':
+                                self.player1_middleRow.remove(card_to_replace)
+                                self.player1_middleRow.append(c)
+                            elif row == 'b':
+                                self.player1_backRow.remove(card_to_replace)
+                                self.player1_backRow.append(c)
+                            self.player1_cards.append(card_to_replace)
+
+                        elif c.name == "In Extremo":
                             self.realiseToAttack(counter, row)
                         elif row == "f":
                             if "spy" in c.effects:
@@ -180,7 +195,18 @@ class ConnectionManager:
                             self.player2_cards.remove(c)
                         if c.type == "weather":
                             self.realiseWeather(c)
-                        if c.name == "In Extremo":
+                        elif c.type == "pos_to_burn":
+                            print("Użyto pożogi")
+                        elif c.type == "trap":
+                            card_to_replace = self.all_Cards[int(message.split(";")[4])]
+                            if row == 'f':
+                                self.player2_frontRow.remove(card_to_replace)
+                            elif row == 'm':
+                                self.player2_middleRow.remove(card_to_replace)
+                            elif row == 'b':
+                                self.player2_backRow.remove(card_to_replace)
+                            self.player2_cards.append(card_to_replace)
+                        elif c.name == "In Extremo":
                             self.realiseToAttack(counter, row)
                         elif row == "f":
                             if "spy" in c.effects:
@@ -708,7 +734,7 @@ class ConnectionManager:
                                 p -= 1
                         if card.power >= max_power:
                             max_power = card.power
-                    if sum >= 10:
+                    if sum >= 10 or card.type == "pos_to_burn":
                         card_to_rem_f = []
                         card_to_rem_m = []
                         card_to_rem_b = []
@@ -911,27 +937,33 @@ class ConnectionManager:
         # czyszczenie pola
 
         for card in self.player1_frontRow:
-            self.player1_stack.append(card)
+            if "hero" not in card.effects:
+                self.player1_stack.append(card)
         self.player1_frontRow = []
 
         for card in self.player1_middleRow:
-            self.player1_stack.append(card)
+            if "hero" not in card.effects:
+                self.player1_stack.append(card)
         self.player1_middleRow = []
 
         for card in self.player1_backRow:
-            self.player1_stack.append(card)
+            if "hero" not in card.effects:
+                self.player1_stack.append(card)
         self.player1_backRow = []
 
         for card in self.player2_frontRow:
-            self.player2_stack.append(card)
+            if "hero" not in card.effects:
+                self.player2_stack.append(card)
         self.player2_frontRow = []
 
         for card in self.player2_middleRow:
-            self.player2_stack.append(card)
+            if "hero" not in card.effects:
+                self.player2_stack.append(card)
         self.player2_middleRow = []
 
         for card in self.player2_backRow:
-            self.player2_stack.append(card)
+            if "hero" not in card.effects:
+                self.player2_stack.append(card)
         self.player2_backRow = []
 
         # upgrades

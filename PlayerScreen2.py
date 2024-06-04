@@ -79,6 +79,7 @@ class PlayerScreen2:
             self.cursor.changeType(2)
 
     def getLocalIP(self):
+        #return "26.83.23.199"
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.connect(("8.8.8.8", 80))

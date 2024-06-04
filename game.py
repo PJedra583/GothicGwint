@@ -614,8 +614,8 @@ class Game:
                             self.moved = True
                     self.messageTimer += self.messageClock.tick(60) / 1000
             else:
-                if self.endGameTimer == 0 and self.player == 2:
-                    send_mess(self, "Close\n")
+                #if self.endGameTimer == 0 and self.player == 2:
+                    #send_mess(self, "Close\n")
                 self.endGameTimer += self.endGameClock.tick(60) / 1000
                 text = self.font_comic.render(
                     self.endGameText, True, (255, 255, 255))
@@ -763,23 +763,83 @@ def handle_click(self, screen):
                                   CARD_SIZE_Y), (CARD_SIZE_X, CARD_SIZE_Y)))
         if card_rect.collidepoint(mouse_pos):
             self.stopHover = True
-            if len(self.rects_to_display) > 0:
-                self.rects_to_display = []
+            self.rects_to_display = []
+            self.cards_to_display = None
+            self.hero_card_to_display = None
             space_for_line = self.screen.get_height() // 8
             if card.type == "front":
-                self.rects_to_display.append(
-                    (screen_width * 0.25, space_for_line * 4, screen_width * 0.75, space_for_line))
+                if "spy" in card.effects:
+                    self.rects_to_display.append(
+                    (screen_width * 0.25, space_for_line * 3, screen_width * 0.75, space_for_line))
+                else:
+                    self.rects_to_display.append(
+                        (screen_width * 0.25, space_for_line * 4, screen_width * 0.75, space_for_line))
             elif card.type == "middle":
-                self.rects_to_display.append(
-                    (screen_width * 0.25, space_for_line * 5, screen_width * 0.75, space_for_line))
+                if "spy" in card.effects:
+                    self.rects_to_display.append(
+                    (screen_width * 0.25, space_for_line * 2, screen_width * 0.75, space_for_line))
+                else:
+                    self.rects_to_display.append(
+                        (screen_width * 0.25, space_for_line * 5, screen_width * 0.75, space_for_line))
             elif card.type == "back":
-                self.rects_to_display.append(
-                    (screen_width * 0.25, space_for_line * 6, screen_width * 0.75, space_for_line))
+                if "spy" in card.effects:
+                    self.rects_to_display.append(
+                    (screen_width * 0.25, space_for_line * 1, screen_width * 0.75, space_for_line))
+                else:
+                    self.rects_to_display.append(
+                        (screen_width * 0.25, space_for_line * 6, screen_width * 0.75, space_for_line))
             elif card.type == "mixed":
                 self.rects_to_display.append(
                     (screen_width * 0.25, space_for_line * 4, screen_width * 0.75, space_for_line))
                 self.rects_to_display.append(
                     (screen_width * 0.25, space_for_line * 5, screen_width * 0.75, space_for_line))
+            elif card.type == "trap":
+                j = 0
+                for card2 in self.MyFrontRow:
+                    card_rect = pygame.Rect((screen.get_width() *
+                                             0.36 +
+                                             (j *
+                                              CARD_SIZE_X *
+                                              0.9), (space_for_line *
+                                                     4) +
+                                             (space_for_line -
+                                              CARD_SIZE_Y)), (CARD_SIZE_X, CARD_SIZE_Y))
+                    if "hero" not in card2.effects:
+                        self.rects_to_display.append(card_rect)
+                    j+=1
+                j = 0
+                for card2 in self.MyMiddleRow:
+                    card_rect = pygame.Rect((screen.get_width() *
+                                             0.36 +
+                                             (j *
+                                              CARD_SIZE_X *
+                                              0.9), (space_for_line *
+                                                     5) +
+                                             (space_for_line -
+                                              CARD_SIZE_Y)), (CARD_SIZE_X, CARD_SIZE_Y))
+                    if "hero" not in card2.effects:
+                        self.rects_to_display.append(card_rect)
+                    j += 1
+                j = 0
+                for card2 in self.MyBackRow:
+                    card_rect = pygame.Rect((screen.get_width() *
+                                             0.36 +
+                                             (j *
+                                              CARD_SIZE_X *
+                                              0.9), (space_for_line *
+                                                     6) +
+                                             (space_for_line -
+                                              CARD_SIZE_Y)), (CARD_SIZE_X, CARD_SIZE_Y))
+                    if "hero" not in card2.effects:
+                        self.rects_to_display.append(card_rect)
+                    j += 1
+            elif card.type == "pos_to_burn":
+                self.rects_to_display.append(
+                    (screen_width * 0.25, space_for_line * 3, screen_width * 0.75, space_for_line))
+                self.rects_to_display.append(
+                    (screen_width * 0.25, space_for_line * 2, screen_width * 0.75, space_for_line))
+                self.rects_to_display.append(
+                    (screen_width * 0.25, space_for_line * 1, screen_width * 0.75, space_for_line))
             elif card.name == "In Extremo":
                 self.rects_to_display.append(
                     (screen_width * 0.25, space_for_line * 4, screen_width * 0.75, space_for_line))
@@ -804,6 +864,7 @@ def handle_click(self, screen):
                         (screen_width * 0.25, space_for_line * 5, screen_width * 0.75, space_for_line))
                     self.rects_to_display.append(
                         (screen_width * 0.25, space_for_line * 6, screen_width * 0.75, space_for_line))
+            print("card = " + str(card.id))
             self.card_to_display = card.id
         i += 1
     hero_rect = pygame.Rect(
@@ -816,7 +877,6 @@ def handle_click(self, screen):
             self.hero_card_to_display = self.heroCard.id
             self.card_to_display = None
             self.stopHover = True
-
 
 def falling_text(self, screen):
     if not (self.passed or self.endGame):
@@ -843,13 +903,37 @@ def checkIfMove(self):
     for rect in self.rects_to_display:
         rect_obj = pygame.Rect(rect)
         if rect_obj.collidepoint(mouse_pos):
-            if rect[1] == (space_for_line * 4):
+            if self.all_Cards[self.card_to_display].type == "trap":
+                j = 0
+                #sprawdzenie manekina
+                for card in self.MyFrontRow:
+                    if rect[0] == int(self.screen.get_width() * 0.36 + (j*CARD_SIZE_X*0.9)):
+                        if rect[1] == (space_for_line * 4)+(space_for_line - CARD_SIZE_Y):
+                            received_message = send_mess(self, "M;" + str(self.card_to_display) + ";" + "f;" + "T;" +
+                                  str(self.MyFrontRow[j].id) + ";" + "\n")
+                    j += 1
+                j = 0
+                for card in self.MyMiddleRow:
+                    if rect[0] == self.screen.get_width() * 0.36 + (j * CARD_SIZE_X * 0.9):
+                        if rect[1] == int((space_for_line * 5)+(space_for_line - CARD_SIZE_Y)):
+                            received_message = send_mess(self, "M;" + str(self.card_to_display) + ";" + "m;" + "T;" +
+                                      str(self.MyMiddleRow[j].id) + ";" + "\n")
+                    j += 1
+                j = 0
+                for card in self.MyBackRow:
+                    if rect[0] == self.screen.get_width() * 0.36 + (j * CARD_SIZE_X * 0.9):
+                        if rect[1] == int((space_for_line * 6)+(space_for_line - CARD_SIZE_Y)):
+                            received_message = send_mess(self, "M;" + str(self.card_to_display) + ";" + "b;" + "T;" +
+                                      str(self.MyBackRow[j].id) + ";" + "\n")
+                    j += 1
+                j = 0
+            elif rect[1] == (space_for_line * 4) or rect[1] == (space_for_line * 3):
                 received_message = send_mess(
                     self, "M;" + str(self.card_to_display) + ";" + "f" + ";\n")
-            elif rect[1] == (space_for_line * 5):
+            elif rect[1] == (space_for_line * 5) or rect[1] == (space_for_line * 2):
                 received_message = send_mess(
                     self, "M;" + str(self.card_to_display) + ";" + "m" + ";\n")
-            elif rect[1] == (space_for_line * 6):
+            elif rect[1] == (space_for_line * 6) or rect[1] == (space_for_line * 1):
                 received_message = send_mess(
                     self, "M;" + str(self.card_to_display) + ";" + "b" + ";\n")
             if received_message.strip() == "Waiting":
