@@ -83,7 +83,8 @@ class ConnectionManager:
 
     def handle_client(self, client_socket, counter):
         try:
-            while True:
+            running = True
+            while running:
                 data = client_socket.recv(1024)
                 if not data:
                     break
@@ -483,6 +484,7 @@ class ConnectionManager:
                         client_socket.send("Got message\n".encode("utf-8"))
                 elif message == "Close\n":
                     client_socket.send("Closing\n".encode("utf-8"))
+                    running = False
                     self.stop_server()
                 else:
                     client_socket.send("Wrong Message\n".encode("utf-8"))

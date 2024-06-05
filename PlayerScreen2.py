@@ -58,6 +58,8 @@ class PlayerScreen2:
                 ip = self.getLocalIP()
                 g = game.Game(screen, ip, 2)
                 g.run()
+                self.connectionManager.stop_server()
+                self.server_thread.join()
                 running = False
             elif self.connectionManager.start == 3:
                 running = False

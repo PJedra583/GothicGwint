@@ -626,8 +626,7 @@ class Game:
                             self.screen.get_height() //
                             2)))
                 if self.endGameTimer >= 5:
-                    if self.player == 2:
-                        send_mess(self, "Close\n")
+                    self.client.close()
                     running = False
             pygame.display.update()
 
