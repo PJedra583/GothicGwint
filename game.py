@@ -118,7 +118,7 @@ class Game:
 
         self.endGame = False
         self.endGameText = ''
-        self.endGameClock = pygame.time.Clock()
+        self.endGameClock = None
         self.endGameTimer = 0
 
     def run(self):
@@ -614,8 +614,6 @@ class Game:
                             self.moved = True
                     self.messageTimer += self.messageClock.tick(60) / 1000
             else:
-                #if self.endGameTimer == 0 and self.player == 2:
-                    #send_mess(self, "Close\n")
                 self.endGameTimer += self.endGameClock.tick(60) / 1000
                 text = self.font_comic.render(
                     self.endGameText, True, (255, 255, 255))
@@ -628,6 +626,8 @@ class Game:
                             self.screen.get_height() //
                             2)))
                 if self.endGameTimer >= 5:
+                    if self.player == 2:
+                        send_mess(self, "Close\n")
                     running = False
             pygame.display.update()
 
@@ -908,20 +908,20 @@ def checkIfMove(self):
                 #sprawdzenie manekina
                 for card in self.MyFrontRow:
                     if rect[0] == int(self.screen.get_width() * 0.36 + (j*CARD_SIZE_X*0.9)):
-                        if rect[1] == (space_for_line * 4)+(space_for_line - CARD_SIZE_Y):
+                        if rect[1] == int((space_for_line * 4)+(space_for_line - CARD_SIZE_Y)):
                             received_message = send_mess(self, "M;" + str(self.card_to_display) + ";" + "f;" + "T;" +
                                   str(self.MyFrontRow[j].id) + ";" + "\n")
                     j += 1
                 j = 0
                 for card in self.MyMiddleRow:
-                    if rect[0] == self.screen.get_width() * 0.36 + (j * CARD_SIZE_X * 0.9):
+                    if rect[0] == int(self.screen.get_width() * 0.36 + (j * CARD_SIZE_X * 0.9)):
                         if rect[1] == int((space_for_line * 5)+(space_for_line - CARD_SIZE_Y)):
                             received_message = send_mess(self, "M;" + str(self.card_to_display) + ";" + "m;" + "T;" +
                                       str(self.MyMiddleRow[j].id) + ";" + "\n")
                     j += 1
                 j = 0
                 for card in self.MyBackRow:
-                    if rect[0] == self.screen.get_width() * 0.36 + (j * CARD_SIZE_X * 0.9):
+                    if rect[0] == int(self.screen.get_width() * 0.36 + (j * CARD_SIZE_X * 0.9)):
                         if rect[1] == int((space_for_line * 6)+(space_for_line - CARD_SIZE_Y)):
                             received_message = send_mess(self, "M;" + str(self.card_to_display) + ";" + "b;" + "T;" +
                                       str(self.MyBackRow[j].id) + ";" + "\n")
@@ -1003,12 +1003,15 @@ def prepare_battlefield(self):
 
     if self.hp == self.opp_hp == 0:
         self.endGame = True
+        self.endGameClock =  pygame.time.Clock()
         self.endGameText = "REMIS"
     elif self.hp == 0:
         self.endGame = True
+        self.endGameClock =  pygame.time.Clock()
         self.endGameText = "PORAŻKA"
     elif self.opp_hp == 0:
         self.endGame = True
+        self.endGameClock =  pygame.time.Clock()
         self.endGameText = "WYGRANA!!!"
 
     self.my_score = int(send_mess(self, "GetMyScore\n"))
